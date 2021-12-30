@@ -1,0 +1,95 @@
+RMS TASBI WINDOWS PROGRESS
+------------------------------------------------
+
+Components Development Progress
+------------------------------------------------
+
+1) RMSFilter
+-------------
+1.  (ok) Create Bill Status List (LUNAS/BELUM LUNAS).
+2.  (ok) Create Filter Options List.
+3.  (ok) Create BlocksList. 
+4.  (ok) Hide All Filters. 
+5.  (ok) Enable Add Functionality to 'Tambah Filter' Button.
+6.  (ok) Show Selected Filter Input.
+7.  (ok) Show Chips based on selected filter.
+8.  (ok) Add deletion capability to chip whenever it's close button clicked.
+9.  (ok) If all filter have been selected, disable 'Tambah Filter' Button.
+10. (ok) Rename 'Reset Filter Button' to 'Hapus Filter Button'.
+11. (ok) If any filter selected enable 'Hapus Filter' Button.
+12. (ok) Load biaya list from database.
+13. (ok) Fill in the downloaded biaya list in to 'Pilih Biaya' dropdown select.
+14. (ok) When any required filter not filled in, show the alert.
+15. (ok) When any required filter not filled in, make the input border become red.
+16. (ok) Create Message State.
+17. (ok) When filter selected, hide 'Select Filter Dropdown'.
+18. (ok) When 'Tambah Filter' button clicked, toggle the visibilty of 'Select Filter Dropdown'.
+19. (ok) When close button on alert message clicked, hide the alert, and make all of the inputs border become normal again.
+20. (ok) Create value state for all inputs.
+21. (ok) Display alert if invalid date input is detected.
+22. (ok) If 'Tampilkan Data' button get clicked, process the query to the database.
+23. (ok) If no filter is selected disable the 'Tampilkan Data Button'.
+24. (ok) Give the input filter a value from it's handleChange property.
+
+2) RMSDataDisplay
+-----------------
+1. (ok) Display data fetched from db inside data grid.
+	problems: 
+	() date still has a problem
+2. (ok) Create current selected row object state.
+3. (ok) modify current selected row object based on current selected row.
+4. () if edit button got clicked, show up an edit form.
+5. () if submit button on edit form got clicked submit the change to the db.
+6. () enable pilih sekaligus button, if it clicked, show up a checkbox.
+7. () if more than one row is selected, disable edit row button.
+8. () if hapus tagihan button clicked delete data from db.
+9. () after data got deleted in the background, display the change in the db only by removing the deleted row from rows array.
+10. () after data got modified in the background, display the change in an offline way.
+11. () if status-tagihan on a row with same kelompok-tagihan become true update each status-kelompok-tagihan to true and so is the reverse way.
+
+3) Login Page
+--------------
+1. (ok) design login Page
+2. (ok) add button to signup instead.
+
+4) Sign Up Page
+----------------
+1. (ok) design signup page
+2. (ok) add button to signup
+3. (ok) add button to login instead
+
+5) Firebase Cloud Messaging
+---------------------------
+1. () add FCM into app.
+
+6) Lihat Faktur Page
+------------------------
+1. () print invoice component.
+2. () split invoice component.
+3. () data grid displaying invoice list.
+
+---------------------------------------------------------------------------------------
+
+MISTERY
+1.(ok) Why there is a state which can be read its current value and there is a state that can not be read. (LihatTagihan.js -> RMSFilter.js -> ic_st_filterOptionsList (can be read)  vs ic_st_isAlertShown (can't be read) )
+(answer) because the isAlertShown state reference not updated
+
+---------------------------------------------------------------------------------------
+
+ACCESS PASSWORD
+1. Pasto Faram - pastofaram07@gmail.com (pastofaram123456)
+
+//doodle
+1. reuse rmsfilter in lihat faktur page.
+
+//revision
+1) Real Time Notification
+2) Pengaturan Biaya Retribusi & Bulanan ok
+3) Input Biaya Custom ok
+4) Satukan biaya bulanan (Biaya per item tidak kelihatan hanya total yang kelihatan) ok
+5) Admin dapat mengubah biaya bulanan apabila diperlukan ok
+6) Tombol share invoice ke whatsapp
+7) Bulk Printing
+8) Biaya bulanan berbeda menurut tipe bangunan ok
+9) Buat fitur seperti aplikasi kasir 
+10) beri diskon reset dulu ke potongan 0% baru apply disc ops

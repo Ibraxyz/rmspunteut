@@ -1,0 +1,6 @@
+{
+  "appId": "com.rms.tasbi",
+  "appName": "tasbi rms",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}
