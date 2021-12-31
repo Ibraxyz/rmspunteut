@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "realestatemangementsystem"
-  }
+    "default": "realestatemangementsystem",
+    "rmsappalias": "rmsapp-ffa22"
+  },
+  "targets": {}
 }

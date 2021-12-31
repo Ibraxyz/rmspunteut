@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Paper, Stack, Button, Snackbar, Alert, Divider, Typography, Container } from "@mui/material";
 import RMSTextField from "../components/RMSTextField";
 import RMSSelect from "../components/RMSSelect";
@@ -10,8 +10,11 @@ import { db } from '../index';
 import { getDoc, doc, setDoc } from 'firebase/firestore';
 import RMSSwitch from '../components/RMSSwitch';
 import { getSeparatedDate } from "../rms-utility/rms-utility";
+import { homeObj } from "../bulk-upload/home-object.js";
+import { collection, addDoc } from 'firebase/firestore';
 
 const InputKK = (props) => {
+    const typoRef = useRef();
     const statusKeaktifan = [
         {
             "text": "Aktif",
@@ -87,6 +90,28 @@ const InputKK = (props) => {
         }
         getListKategori();
     }, []);
+    const bulkUpload = async () => {
+        /**
+         * for (let i = 0; i < homeObj.length; i++) {
+            try {
+                const docRef = await addDoc(collection(db, 'kk'), {
+                    "blok": homeObj[i]['blok'],
+                    "no_rumah": homeObj[i]['no'],
+                    "biaya-bulanan": homeObj[i]['ikk']
+                });
+                console.log("Document written with ID: ", docRef.id);
+                typoRef.current.innerHTML = `${homeObj[i]['blok']} | ${homeObj[i]['no']} telah ditambahkan.. | ${i}/${homeObj.length} ( ${Math.ceil((i/homeObj.length)*100)} %)`;
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+            if (i === 500 || i === 1000 || i === 1500 || i === 2000 || i === 2500 || i === 3000) {
+                setTimeout(() => {
+                    console.log('break...');
+                }, 1000)
+            }
+        }
+         */
+    }
     useEffect(() => {
         if (!isManuallyInputIKK) {
             setBiayaBulanan(pureListKategori[kategoriBangunan]);
@@ -95,6 +120,14 @@ const InputKK = (props) => {
     return (
         <Box style={{ marginBottom: "20px" }}>
             <Paper>
+                {/**
+                 * <Box sx={{ padding: '10px' }}>
+                    <Button variant={'contained'} onClick={() => {
+                        bulkUpload();
+                    }}>Bulk Upload</Button>
+                    <Typography sx={{ marginLeft: '5px' }} variant={'caption'} ref={typoRef}>0</Typography>
+                </Box>
+                 */}
                 <Box sx={{ padding: '10px' }}>
                     <RMSSwitch label={'IKK berdasarkan kategori bangunan'} handleChange={(v) => { setBiayaBulanan([]); setIsManuallyInputIKK(!v) }} />
                 </Box>

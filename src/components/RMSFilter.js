@@ -11,9 +11,12 @@ import RMSDatePicker from './RMSDatePicker';
 import RMSAlert from './RMSAlert';
 //utility components
 import md5 from 'md5';
+import RMSGroupedSelect from '../components/RMSGroupedSelect';
+import useGroupedSelect from '../hooks/useGroupedSelect';
 
 const RMSFilter = (props) => {
     const [ic_st_isSelectFilterOptionShown, ic_st_setIsSelectFilterShown] = useState(false);
+    const [ic_st_an,ic_st_aazz,ic_st_tasbiII] = useGroupedSelect();
     return (
         <Box style={{ marginBottom: "20px" }}>
             <Paper>
@@ -25,7 +28,18 @@ const RMSFilter = (props) => {
                             switch (option.type) {
                                 case 'select':
                                     return (
-                                        <RMSSelect key={md5(option.value + ',' + index)} isError={option.isError(index) && props.isAlertShown ? true : false} isRequired={props.isRequired} displayFilter={option.isSelected ? "default" : "none"} label={option.text} helperText={option.helperText} items={option.items} value={option.propertyValue} handleChange={(value) => { option.handleChange(value, index) }} />
+                                        option.value === 'blok' ?
+                                            <RMSGroupedSelect
+                                                isError={option.isError(index) && props.isAlertShown ? true : false}
+                                                isRequired={true}
+                                                displayFilter={option.isSelected ? "default" : "none"}
+                                                an={ic_st_an}
+                                                aazz={ic_st_aazz}
+                                                tasbiII={ic_st_tasbiII}
+                                                value={option.propertyValue}
+                                                handleChange={(value) => { option.handleChange(value, index) }}
+                                            /> :
+                                            <RMSSelect key={md5(option.value + ',' + index)} isError={option.isError(index) && props.isAlertShown ? true : false} isRequired={props.isRequired} displayFilter={option.isSelected ? "default" : "none"} label={option.text} helperText={option.helperText} items={option.items} value={option.propertyValue} handleChange={(value) => { option.handleChange(value, index) }} />
                                     );
                                 case 'text':
                                     return (
@@ -57,7 +71,7 @@ const RMSFilter = (props) => {
                     }
                 </Box>
                 <Divider />
-                <Box sx={{ paddingTop: "10px" , paddingLeft:'5px', paddingRight:'5px',paddingBottom:'10px'}}>
+                <Box sx={{ paddingTop: "10px", paddingLeft: '5px', paddingRight: '5px', paddingBottom: '10px' }}>
                     <Button variant="outlined" sx={{
                         margin: "5px"
                     }} disabled={props.options.filter((option) => { return option['isSelected'] === true }).length > 0 ? false : true} onClick={() => { props.handleResetFilter() }}>Hapus Filter</Button>

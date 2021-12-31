@@ -165,48 +165,55 @@ const RMSMakeInvoice = (props) => {
             let totalDataLength = k_data.length;
             let step = 100 / totalDataLength;
             for (var i = 0; i < k_data.length; i++) { //iterate over kk
-                let totalBiaya = k_data[i]['biaya-bulanan'];
-                let namaDaftarTagihan = [k_data[i]['nama-biaya-bulanan']];
-                let tagihanObject = [
-                    {
-                        biaya: totalBiaya,
-                        id: k_data[i]['id-biaya-bulanan'],
-                        jenis: `${k_data[i]['nama-biaya-bulanan']} | ${k_data[i]['kategori-bangunan']} ( x 1 )`,
-                        qty: "1"
-                    }
-                ]
-                //---------------------------------------------------------------------------------------------------
-                obj["subtotal"] = totalBiaya;
-                obj["potongan"] = 0;
-                obj["biaya"] = totalBiaya;
-                obj['banyak-biaya'] = 1;
-                obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok;
-                obj["email"] = k_data[i].email === undefined ? "undefined" : k_data[i].email;
-                obj["tagihan"] = tagihanObject;
-                obj["nama-daftar-tagihan"] = namaDaftarTagihan;
-                obj["nomor-kk"] = k_data[i].no_kk === undefined ? "undefined" : k_data[i].no_kk;
-                obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah;
-                obj["sisa"] = totalBiaya;
-                obj["status-invoice"] = false;
-                obj["sudah-dibayar"] = 0;
-                obj["tanggal-aktif"] = getTime(tanggalAktif);
-                obj["tanggal-dibayar"] = getTime(tanggalDibayar);
-                obj["tanggal-dibuat"] = Date.now();
-                obj["nomor-telpon"] = k_data[i].telp === undefined ? "undefined" : k_data[i].telp;
-                obj["nomor-hp"] = k_data[i].hp === undefined ? "undefined" : k_data[i].hp;
-                obj["kolektor"] = '-';
-                obj['bulan'] = activeDate.month;
-                obj['tahun'] = activeDate.year;
-                obj['hari'] = activeDate.day;
-                obj['kategori'] = 'bulanan';
-                //obj['bulan'] = nowDa
-                try {
-                    await i_addData(obj);
+                if (k_data['biaya-bulanan'] === 'TMB' || k_data['biaya-bulanan'] === 'RK' || k_data['biaya-bulanan'] === 'EMPTY') {
+                    //do nothing
+                    console.log('ikk is RK/TMB/EMPTY so not created..');
                     progressCounter += step;
                     setGenerateMultipleBillsProgressLong(progressCounter);
-                } catch (error) {
-                    setRmsAlertMessage("Error");
-                    setIsAlertShown(true);
+                } else {
+                    let totalBiaya = k_data[i]['biaya-bulanan'];
+                    let namaDaftarTagihan = [k_data[i]['nama-biaya-bulanan']];
+                    let tagihanObject = [
+                        {
+                            biaya: totalBiaya,
+                            id: k_data[i]['id-biaya-bulanan'],
+                            jenis: `${k_data[i]['nama-biaya-bulanan']} | ${k_data[i]['kategori-bangunan']} ( x 1 )`,
+                            qty: "1"
+                        }
+                    ]
+                    //---------------------------------------------------------------------------------------------------
+                    obj["subtotal"] = totalBiaya;
+                    obj["potongan"] = 0;
+                    obj["biaya"] = totalBiaya;
+                    obj['banyak-biaya'] = 1;
+                    obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok;
+                    obj["email"] = k_data[i].email === undefined ? "undefined" : k_data[i].email;
+                    obj["tagihan"] = tagihanObject;
+                    obj["nama-daftar-tagihan"] = namaDaftarTagihan;
+                    obj["nomor-kk"] = k_data[i].no_kk === undefined ? "undefined" : k_data[i].no_kk;
+                    obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah;
+                    obj["sisa"] = totalBiaya;
+                    obj["status-invoice"] = false;
+                    obj["sudah-dibayar"] = 0;
+                    obj["tanggal-aktif"] = getTime(tanggalAktif);
+                    obj["tanggal-dibayar"] = getTime(tanggalDibayar);
+                    obj["tanggal-dibuat"] = Date.now();
+                    obj["nomor-telpon"] = k_data[i].telp === undefined ? "undefined" : k_data[i].telp;
+                    obj["nomor-hp"] = k_data[i].hp === undefined ? "undefined" : k_data[i].hp;
+                    obj["kolektor"] = '-';
+                    obj['bulan'] = activeDate.month;
+                    obj['tahun'] = activeDate.year;
+                    obj['hari'] = activeDate.day;
+                    obj['kategori'] = 'bulanan';
+                    //obj['bulan'] = nowDa
+                    try {
+                        await i_addData(obj);
+                        progressCounter += step;
+                        setGenerateMultipleBillsProgressLong(progressCounter);
+                    } catch (error) {
+                        setRmsAlertMessage("Error");
+                        setIsAlertShown(true);
+                    }
                 }
             }
             ic_st_setIsProgressShown(false);

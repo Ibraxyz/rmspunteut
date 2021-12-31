@@ -315,6 +315,7 @@ const useLihatLogic = (jenisLihatLogic) => {
                             blok: dt.blok,//ok
                             no_rumah: dt.no_rumah, //ok
                             no_kk: dt.no_kk, //ok
+                            ikk: dt['biaya-bulanan'],
                             telp: dt.telp, //ok
                             hp: dt.hp, //ok
                             email: dt.email, //ok

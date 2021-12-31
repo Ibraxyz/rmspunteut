@@ -10,8 +10,11 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../index';
 import { formatRupiah } from '../rms-utility/rms-utility';
 import ReportSVG from '../images/report.svg';
+import RMSGroupedSelect from '../components/RMSGroupedSelect';
+import useGroupedSelect from '../hooks/useGroupedSelect';
 
 const RMSReport = (props) => {
+    const [ic_st_an,ic_st_aazz,ic_st_tasbiII] = useGroupedSelect();
     const [ic_st_year, ic_st_setYear] = useState([]);
     const [h_st_isSnackbarShown, h_st_message, h_st_severity, h_sf_showSnackbar, h_sf_closeSnackbar] = useSnackbar();
     const [ic_st_blok, ic_st_setBlok] = useState([]);
@@ -183,9 +186,21 @@ const RMSReport = (props) => {
                 <Divider />
                 <Box sx={{ padding: '10px' }}>
                     <Stack direction={'column'}>
-                        <RMSSelect isRequired={true} items={ic_st_blokItems} isError={ic_st_blok.length === 0 && h_st_isSnackbarShown} label={"Blok"} value={ic_st_blok} helperText={"Masukkan Blok"} handleChange={(v) => {
+                        {/** <RMSSelect isRequired={true} items={ic_st_blokItems} isError={ic_st_blok.length === 0 && h_st_isSnackbarShown} label={"Blok"} value={ic_st_blok} helperText={"Masukkan Blok"} handleChange={(v) => {
                             ic_st_setBlok(v);
-                        }} />
+                        }} /> */}
+                        <RMSGroupedSelect
+                            isError={ic_st_blok.length === 0 && h_st_isSnackbarShown}
+                            isRequired={true}
+                            displayFilter={'default'}
+                            an={ic_st_an}
+                            aazz={ic_st_aazz}
+                            tasbiII={ic_st_tasbiII}
+                            value={ic_st_blok}
+                            handleChange={(v) => {
+                                ic_st_setBlok(v);
+                            }}
+                        />
                         <RMSTextField isRequired={true} type={"number"} isError={ic_st_year.length === 0 && h_st_isSnackbarShown} label={"Tahun"} value={ic_st_year} helperText={"Masukkan tahun"} handleChange={(v) => {
                             ic_st_setYear(v);
                         }} />

@@ -22,6 +22,9 @@ import { getSeparatedDate } from '../rms-utility/rms-utility';
 import { Link } from 'react-router-dom';
 import useBlok from '../hooks/useBloks';
 
+import RMSGroupedSelect from '../components/RMSGroupedSelect';
+import useGroupedSelect from '../hooks/useGroupedSelect';
+
 const productList = [
     {
         "text": 'Biaya Bulanan',
@@ -46,6 +49,7 @@ const productList = [
 ]
 
 const RMSBuatInvoiceUmum = (props) => {
+    const [ic_st_an, ic_st_aazz, ic_st_tasbiII] = useGroupedSelect();
     //blok items
     const [ic_st_blokItems] = useBlok();
     //functions - construct variant items
@@ -434,7 +438,17 @@ const RMSBuatInvoiceUmum = (props) => {
                 <Divider />
                 <Box sx={{ padding: '10px' }}>
                     <RMSTextField isError={false} isRequired={false} type={"text"} displayFilter={'default'} label={'Kepada'} helperText={'Masukkan Nama Tujuan Invoice'} value={ic_st_kepada} handleChange={(value) => { ic_st_setKepada(value); }} />
-                    <RMSSelect isError={false} isRequired={false} displayFilter={'default'} label={'Blok'} helperText={'Blok Rumah'} items={ic_st_blokItems} value={ic_st_blok} handleChange={(value) => { resetItemList(); ic_st_setBlok(value); ic_st_setActiveVariant(constructVariant(value)); }} />
+                    {/** <RMSSelect isError={false} isRequired={false} displayFilter={'default'} label={'Blok'} helperText={'Blok Rumah'} items={ic_st_blokItems} value={ic_st_blok} handleChange={(value) => { resetItemList(); ic_st_setBlok(value); ic_st_setActiveVariant(constructVariant(value)); }} /> */}
+                    <RMSGroupedSelect
+                        isError={false}
+                        isRequired={false}
+                        displayFilter={'default'}
+                        an={ic_st_an}
+                        aazz={ic_st_aazz}
+                        tasbiII={ic_st_tasbiII}
+                        value={ic_st_blok}
+                        handleChange={(value) => { resetItemList(); ic_st_setBlok(value); ic_st_setActiveVariant(constructVariant(value)); }}
+                    />
                     <RMSTextField isError={false} isRequired={false} type={"text"} displayFilter={'default'} label={'Nomor Rumah'} helperText={'Masukkan Nomor Rumah'} value={ic_st_no} handleChange={(value) => { ic_st_setNo(value); }} />
                     <RMSSelect isError={false} isRequired={true} displayFilter={'default'} label={'Kategori'} helperText={'Kategori Invoice'} items={["bulanan", "retribusi", "custom"].map((alphabet) => { return { "text": alphabet, "value": alphabet } })} value={ic_st_category} handleChange={(value) => { ic_st_setCategory(value); }} />
                 </Box>

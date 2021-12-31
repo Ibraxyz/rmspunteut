@@ -12,9 +12,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Cancel';
 import useDataEditLogic from "../hooks/useDataEditLogic";
+import useGroupedSelect from "../hooks/useGroupedSelect";
+import RMSGroupedSelect from "../components/RMSGroupedSelect";
 import {getTime} from 'date-fns';
 
 const LihatBiaya = (props) => {
+    const [ic_st_an,ic_st_aazz,ic_st_tasbiII] = useGroupedSelect();
     const [
         blocks,
         setBlok,
@@ -184,7 +187,17 @@ const LihatBiaya = (props) => {
                     <Box sx={{ padding: "10px" }}>
                         <RMSAlert isOpen={isFilterDangerALertShow} message={""} setIsOpen={() => { setIsFilterDangerAlertShow(false) }} />
                         <RMSSelect isError={((tagihan === null || tagihan.length === 0) && isFilterDangerALertShow)} isRequired={true} displayFilter={isTagihanFilterShow ? "default" : "none"} label={"Tagihan"} helperText={"Jenis Tagihan"} items={l_jenisTagihan === null ? [] : l_jenisTagihan} value={tagihan} handleChange={(value) => { setTagihan(value) }} />
-                        <RMSSelect isError={((blok === null || blok.length === 0) && isFilterDangerALertShow)} isRequired={true} displayFilter={isBlokFilterShow ? "default" : "none"} label={"Blok"} helperText={"Pilih Blok Rumah"} items={blocks} value={blok} handleChange={(value) => { setBlok(value) }} />
+                        {/** <RMSSelect isError={((blok === null || blok.length === 0) && isFilterDangerALertShow)} isRequired={true} displayFilter={isBlokFilterShow ? "default" : "none"} label={"Blok"} helperText={"Pilih Blok Rumah"} items={blocks} value={blok} handleChange={(value) => { setBlok(value) }} /> */}
+                        <RMSGroupedSelect
+                            isError={((blok === null || blok.length === 0) && isFilterDangerALertShow)}
+                            isRequired={true}
+                            displayFilter={isBlokFilterShow ? "default" : "none"}
+                            an={ic_st_an}
+                            aazz={ic_st_aazz}
+                            tasbiII={ic_st_tasbiII}
+                            value={blok}
+                            handleChange={(value) => { setBlok(value) }}
+                        />
                         <RMSTextField isError={((nomorTagihan === null || nomorTagihan.length === 0) && isFilterDangerALertShow) ? true : false} isRequired={true} displayFilter={isNomorTagihanFilterShow ? "default" : "none"} label={"Nomor Tagihan"} helperText={"Masukkan Nomor Tagihan"} value={nomorTagihan} handleChange={(value) => setNomorTagihan(value)} />
                         <RMSTextField isError={((nomorKk === null || nomorKk.length === 0) && isFilterDangerALertShow) ? true : false} isRequired={true} displayFilter={isNomorKKFilterShow ? "default" : "none"} label={"Nomor KK"} helperText={"Masukkan Nomor KK"} value={nomorKk} handleChange={(value) => setNomorKk(value)} />
                         <RMSTextField isError={((noRumah === null || noRumah.length === 0) && isFilterDangerALertShow) ? true : false} isRequired={true} displayFilter={isNomorRumahFilterShow ? "default" : "none"} label={"Nomor Rumah"} helperText={"Masukkan Nomor Rumah"} value={noRumah} handleChange={(value) => { setNoRumah(value) }} />
