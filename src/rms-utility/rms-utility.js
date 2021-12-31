@@ -72,7 +72,7 @@ const defineMonthName = (month) => {
     return name;
 }
 //const substractIkkReport
-const substractIkkReport = async (status, tahun, id) => {
+const substractIkkReport = async (status, blok, tahun) => {
     //substract ikk report
     if (status === false) {
         console.log('invoice belum lunas jadi substract tidak dilakukan...');
@@ -80,16 +80,35 @@ const substractIkkReport = async (status, tahun, id) => {
     }
     //get wanted doc
     try {
-        await deleteDoc(doc(db, `ikk-report/${tahun}/data/${id}`));
+        const ref = collection(db, `ikk-report/${tahun}/data/`);
+        const conditions = [
+            where('blok-only', '==', blok),
+        ];
+        const querySnapshot = await getDocs(query(ref, ...conditions));
+        const idToBeDeleted = [];
+        querySnapshot.forEach((doc) => {
+            idToBeDeleted.push(doc.id);
+        });
+        //delete the docs
+        for (let i = 0; i < idToBeDeleted.length; i++) {
+            try {
+                await deleteDoc(doc(db, `ikk-report/${tahun}/data/${idToBeDeleted[i]}`));
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
     } catch (err) {
         console.log(err.message);
     }
 }
 
-const substractReport = async () => {
+const substractReport = async (status, blok, norumah, bulan, tahun) => {
     //substract per blok report
+
     //substract merged report
+
     //substract merged yearly report
+
     //substract all time report
 }
 
@@ -255,4 +274,4 @@ const createReport = async (blok, category, nominal, currentUser) => {
         alert(err.message);
     }
 }
-export { asyncForEach, formatRupiah, getSeparatedDate, defineMonthName, createReport, createIkkReport, substractIkkReport };
+export { asyncForEach, formatRupiah, getSeparatedDate, defineMonthName, createReport, createIkkReport, substractIkkReport, substractReport };

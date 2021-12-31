@@ -148,107 +148,128 @@ const RMSMakeInvoice = (props) => {
         }
     }, [tanggalAktif])
     const generateMultipleBills = async () => {
-        ic_st_setIsProgressShown(true);
-        //abort if aktif date not selected
-        console.log('tanggal aktif length', tanggalAktif.length);
-        if (tanggalAktif === "" || tanggalAktif.length === 0) {
-            alert('Tanggal harus dipilih terlebih dahulu');
-            return;
-        }
-        //tanggal aktif
-        const activeDate = getSeparatedDate(tanggalAktif); //format tanggal aktif adalah Fri Dec 24 2021 12:13:51 GMT+0700 (Western Indonesia Time) bukan timestamp dlm bentuk ms
-        //abort ops if selected date already created
         try {
-            const docSnap = await getDoc(doc(db, `monthlyInvoiceTracker/${activeDate.year}-${activeDate.month}/`));
-            if (docSnap.exists()) {
-                alert('Invoice bulanan untuk bulan dan tahun ini sudah di cetak.Apabila anda mencetak lagi maka akan terjadi duplikasi data invoice.. untuk mengedit invoice dapat melalui menu lihat invoice > hapus invoice , buat invoice umum > kategori bulanan');
+            ic_st_setIsProgressShown(true);
+            //abort if aktif date not selected
+            console.log('tanggal aktif length', tanggalAktif.length);
+            if (tanggalAktif === "" || tanggalAktif.length === 0) {
+                alert('Tanggal harus dipilih terlebih dahulu');
                 return;
             }
-        } catch (err) {
-            console.log(err);
-            alert(err.message);
-        }
-        //individual bill object
-        const obj = {}
-        //generate multiple bills
-        if (k_data.length == 0) {
-            setRmsAlertMessage(`Tidak ada data ${k_data.length === 0 ? 'kk dan tagihan' : k_data.length === 0 ? 'kk' : 'tagihan'}`);
-            setIsAlertShown(true);
-            return;
-        } else {
-            console.log("generating multiple bills...");
-            let progressCounter = 0;
-            let totalDataLength = k_data.length;
-            let step = 100 / totalDataLength;
-            for (var i = 0; i < k_data.length; i++) { //iterate over kk
-                if (k_data['biaya-bulanan'] === 'TMB' || k_data['biaya-bulanan'] === 'RK' || k_data['biaya-bulanan'] === 'EMPTY') {
-                    //do nothing
-                    console.log('ikk is RK/TMB/EMPTY so not created..');
-                    progressCounter += step;
-                    //setGenerateMultipleBillsProgressLong(progressCounter);
-                    circularProgressRef.current.innerHTML = `${Math.round(progressCounter)}%`;
+            //tanggal aktif
+            const activeDate = getSeparatedDate(tanggalAktif); //format tanggal aktif adalah Fri Dec 24 2021 12:13:51 GMT+0700 (Western Indonesia Time) bukan timestamp dlm bentuk ms
+            //abort ops if selected date already created
+            try {
+                const docSnap = await getDoc(doc(db, `monthlyInvoiceTracker/${activeDate.year}-${activeDate.month}/`));
+                if (docSnap.exists()) {
+                    alert('Invoice bulanan untuk bulan dan tahun ini sudah di cetak.Apabila anda mencetak lagi maka akan terjadi duplikasi data invoice.. untuk mengedit invoice dapat melalui menu lihat invoice > hapus invoice , buat invoice umum > kategori bulanan');
+                    return;
+                }
+            } catch (err) {
+                console.log(err);
+                alert(err.message);
+                return;
+            }
+            //individual bill object
+            const obj = {}
+            //generate multiple bills
+            if (k_data.length == 0) {
+                setRmsAlertMessage(`Tidak ada data ${k_data.length === 0 ? 'kk dan tagihan' : k_data.length === 0 ? 'kk' : 'tagihan'}`);
+                setIsAlertShown(true);
+                return;
+            } else {
+                console.log("generating multiple bills...");
+                let progressCounter = 0;
+                let totalDataLength = k_data.length;
+                let step = 100 / totalDataLength;
+                //get data for biaya bulanan
+                const bb = await getDoc(doc(db, `bb/bb1`));
+                let idBiaya_ = null;
+                if (bb.exists()) {
+                    idBiaya_ = bb.id;
                 } else {
-                    let totalBiaya = k_data[i]['biaya-bulanan'];
-                    let namaDaftarTagihan = [k_data[i]['nama-biaya-bulanan']];
-                    let tagihanObject = [
-                        {
-                            biaya: totalBiaya,
-                            id: k_data[i]['id-biaya-bulanan'],
-                            jenis: `${k_data[i]['nama-biaya-bulanan']} | ${k_data[i]['kategori-bangunan']} ( x 1 )`,
-                            qty: "1"
-                        }
-                    ]
-                    //---------------------------------------------------------------------------------------------------
-                    obj["subtotal"] = totalBiaya;
-                    obj["potongan"] = 0;
-                    obj["biaya"] = totalBiaya;
-                    obj['banyak-biaya'] = 1;
-                    obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok;
-                    obj["email"] = k_data[i].email === undefined ? "undefined" : k_data[i].email;
-                    obj["tagihan"] = tagihanObject;
-                    obj["nama-daftar-tagihan"] = namaDaftarTagihan;
-                    obj["nomor-kk"] = k_data[i].no_kk === undefined ? "undefined" : k_data[i].no_kk;
-                    obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah;
-                    obj["sisa"] = totalBiaya;
-                    obj["status-invoice"] = false;
-                    obj["sudah-dibayar"] = 0;
-                    obj["tanggal-aktif"] = getTime(tanggalAktif);
-                    obj["tanggal-dibayar"] = getTime(tanggalDibayar);
-                    obj["tanggal-dibuat"] = Date.now();
-                    obj["nomor-telpon"] = k_data[i].telp === undefined ? "undefined" : k_data[i].telp;
-                    obj["nomor-hp"] = k_data[i].hp === undefined ? "undefined" : k_data[i].hp;
-                    obj["kolektor"] = '-';
-                    obj['bulan'] = activeDate.month;
-                    obj['tahun'] = activeDate.year;
-                    obj['hari'] = activeDate.day;
-                    obj['kategori'] = 'bulanan';
-                    //obj['bulan'] = nowDa
-                    try {
-                        await i_addData(obj);
+                    alert('ERROR : tidak ada ada data biaya bulanan');
+                    return;
+                }
+                for (var i = 0; i < k_data.length; i++) { //iterate over kk : k_data.length
+                    if (k_data['biaya-bulanan'] === 'TMB' || k_data['biaya-bulanan'] === 'RK' || k_data['biaya-bulanan'] === 'EMPTY') {
+                        //do nothing
+                        console.log('ikk is RK/TMB/EMPTY so not created..');
                         progressCounter += step;
                         //setGenerateMultipleBillsProgressLong(progressCounter);
-                        circularProgressRef.current.innerHTML = `${Math.round(progressCounter)}%`;
-                    } catch (err) {
-                        console.log(err.message);
-                        setRmsAlertMessage("Error");
-                        setIsAlertShown(true);
-                        return;
+                        circularProgressRef.current.innerHTML = `Progress : ${Math.round(progressCounter)}%`;
+                    } else {
+                        let totalBiaya = k_data[i]['biaya-bulanan'];
+                        let namaDaftarTagihan = [bb.data().jenis];
+                        let tagihanObject = [
+                            {
+                                biaya: totalBiaya,
+                                id: idBiaya_,
+                                jenis: bb.data().jenis,
+                                qty: "1"
+                            }
+                        ]
+                        //---------------------------------------------------------------------------------------------------
+                        obj["subtotal"] = totalBiaya;
+                        obj["potongan"] = 0;
+                        obj["biaya"] = totalBiaya;
+                        obj['banyak-biaya'] = 1;
+                        obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok;
+                        obj["email"] = k_data[i].email === undefined ? "undefined" : k_data[i].email;
+                        obj["tagihan"] = tagihanObject;
+                        obj["nama-daftar-tagihan"] = namaDaftarTagihan.filter((daftar) => {
+                            console.log(daftar);
+                            return daftar !== undefined;
+                        });;
+                        obj["nomor-kk"] = k_data[i].no_kk === undefined ? "undefined" : k_data[i].no_kk;
+                        obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah;
+                        obj["sisa"] = totalBiaya;
+                        obj["status-invoice"] = false;
+                        obj["sudah-dibayar"] = 0;
+                        obj["tanggal-aktif"] = getTime(tanggalAktif);
+                        obj["tanggal-dibayar"] = getTime(tanggalDibayar);
+                        obj["tanggal-dibuat"] = Date.now();
+                        obj["nomor-telpon"] = k_data[i].telp === undefined ? "undefined" : k_data[i].telp;
+                        obj["nomor-hp"] = k_data[i].hp === undefined ? "undefined" : k_data[i].hp;
+                        obj["kolektor"] = '-';
+                        obj['bulan'] = activeDate.month;
+                        obj['tahun'] = activeDate.year;
+                        obj['hari'] = activeDate.day;
+                        obj['kategori'] = 'bulanan';
+                        //obj['bulan'] = nowDa
+                        try {
+                            console.log(obj);
+                            await i_addData(obj);
+                            progressCounter += step;
+                            //setGenerateMultipleBillsProgressLong(progressCounter);
+                            circularProgressRef.current.innerHTML = `Progress : ${Math.round(progressCounter)}%`;
+                        } catch (err) {
+                            console.log(err.message);
+                            setRmsAlertMessage("Error");
+                            setIsAlertShown(true);
+                            console.log('error occured so BREAKED OPERATION');
+                            break;
+                        }
                     }
                 }
+                //set successfull ops notif 
+                setIsSuccessCreatingTagihanShow(true);
+                //set monthly invoice tracker
+                try {
+                    await setDoc(doc(db, `monthlyInvoiceTracker/${activeDate.year}-${activeDate.month}/`), {
+                        "isGenerated": true
+                    })
+                } catch (err) {
+                    console.log(err.message);
+                }
+                ic_st_setIsProgressShown(false);
+                //setGenerateMultipleBillsProgressLong(0);
+                circularProgressRef.current.innerHTML = 0;
             }
-            //set successfull ops notif 
-            setIsSuccessCreatingTagihanShow(true);
-            //set monthly invoice tracker
-            try {
-                await setDoc(doc(db, `monthlyInvoiceTracker/${activeDate.year}-${activeDate.month}/`), {
-                    "isGenerated": true
-                })
-            } catch (err) {
-                console.log(err.message);
-            }
-            ic_st_setIsProgressShown(false);
-            //setGenerateMultipleBillsProgressLong(0);
-            circularProgressRef.current.innerHTML = 0;
+        } catch (err) {
+            console.log(err.message);
+            alert(err.message);
+            return;
         }
     }
     return (
@@ -264,9 +285,9 @@ const RMSMakeInvoice = (props) => {
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Box sx={{ display: 'inline-flex' }}>
                                 <CircularProgressWithLabel
-                                    isVisible={ic_st_isProgressShown} 
+                                    isVisible={ic_st_isProgressShown}
                                     ref={circularProgressRef}
-                                    />
+                                />
                             </Box>
                         </Box>
                         <Button sx={{ margin: "5px" }} variant={"contained"}

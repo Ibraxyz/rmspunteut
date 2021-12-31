@@ -500,12 +500,17 @@ function App() {
     }
   }, [ic_st_kmSelectedTahun])
   onAuthStateChanged(auth, (user) => {
-    if (user) { //user is signed in
-      console.log('onAuthStateChanged get called');
-      ic_st_setUser(user);
-    } else {
-      // User is signed out
-      ic_st_setUser(null);
+    try{
+      if (user) { //user is signed in
+        console.log('onAuthStateChanged get called');
+        ic_st_setUser(user);
+      } else {
+        // User is signed out
+        ic_st_setUser(null);
+      }
+    }catch(err){
+      console.log(err.message);
+      h_sf_showSnackbar(err.message,'error');
     }
   });
   return (
