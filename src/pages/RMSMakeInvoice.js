@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getTime } from 'date-fns';
 import md5 from 'md5';
 import {
@@ -21,9 +21,10 @@ import useInputForm from "../hooks/useInputForm";
 import useInputValidation from "../hooks/useInputValidation";
 import useDataOperations from "../hooks/useDataOperations";
 import { getSeparatedDate } from "../rms-utility/rms-utility";
-import { connectFirestoreEmulator } from "@firebase/firestore";
+import { doc, getDoc, getDocs, collection, query, setDoc } from "@firebase/firestore";
+import { db } from '../index';
 
-function CircularProgressWithLabel(props) {
+const CircularProgressWithLabel = React.forwardRef((props, ref) => {
     return (
         <Box sx={{ position: 'relative', display: props.isVisible ? 'inline-flex' : 'none' }}>
             <CircularProgress variant="determinate" {...props} />
@@ -39,15 +40,14 @@ function CircularProgressWithLabel(props) {
                     justifyContent: 'center',
                 }}
             >
-                <Typography variant="caption" component="div" color="text.secondary">
-                    {`${Math.round(props.value)}%`}
-                </Typography>
+                <Typography variant="caption" component="div" color="text.secondary" ref={ref}></Typography>
             </Box>
         </Box>
     );
-}
+});
 
 const RMSMakeInvoice = (props) => {
+    const circularProgressRef = useRef();
     const nowDate = Date.now();
     //const [b_isLoading, b_data, b_addData, b_getData, b_editData, b_deleteData] = useDataOperations('biaya');
     const [k_isLoading, k_data, k_addData, k_getData, k_editData, k_deleteData] = useDataOperations('kk');
@@ -75,7 +75,6 @@ const RMSMakeInvoice = (props) => {
     const [tanggalMulai, setTanggalMulai] = useState(null);
     const [tanggalAkhir, setTanggalAkhir] = useState(null);
     const [telp, setTelp] = useState(""); //ok
-    const [generateMultipleBillsProgressLong, setGenerateMultipleBillsProgressLong] = useState(0);
     const [rmsAlertMessage, setRmsAlertMessage] = useState("Mohon isi inputan yang masih kosong");
     const obj = {
         "biaya": biaya, //ok
@@ -150,8 +149,25 @@ const RMSMakeInvoice = (props) => {
     }, [tanggalAktif])
     const generateMultipleBills = async () => {
         ic_st_setIsProgressShown(true);
+        //abort if aktif date not selected
+        console.log('tanggal aktif length', tanggalAktif.length);
+        if (tanggalAktif === "" || tanggalAktif.length === 0) {
+            alert('Tanggal harus dipilih terlebih dahulu');
+            return;
+        }
         //tanggal aktif
         const activeDate = getSeparatedDate(tanggalAktif); //format tanggal aktif adalah Fri Dec 24 2021 12:13:51 GMT+0700 (Western Indonesia Time) bukan timestamp dlm bentuk ms
+        //abort ops if selected date already created
+        try {
+            const docSnap = await getDoc(doc(db, `monthlyInvoiceTracker/${activeDate.year}-${activeDate.month}/`));
+            if (docSnap.exists()) {
+                alert('Invoice bulanan untuk bulan dan tahun ini sudah di cetak.Apabila anda mencetak lagi maka akan terjadi duplikasi data invoice.. untuk mengedit invoice dapat melalui menu lihat invoice > hapus invoice , buat invoice umum > kategori bulanan');
+                return;
+            }
+        } catch (err) {
+            console.log(err);
+            alert(err.message);
+        }
         //individual bill object
         const obj = {}
         //generate multiple bills
@@ -169,7 +185,8 @@ const RMSMakeInvoice = (props) => {
                     //do nothing
                     console.log('ikk is RK/TMB/EMPTY so not created..');
                     progressCounter += step;
-                    setGenerateMultipleBillsProgressLong(progressCounter);
+                    //setGenerateMultipleBillsProgressLong(progressCounter);
+                    circularProgressRef.current.innerHTML = `${Math.round(progressCounter)}%`;
                 } else {
                     let totalBiaya = k_data[i]['biaya-bulanan'];
                     let namaDaftarTagihan = [k_data[i]['nama-biaya-bulanan']];
@@ -209,15 +226,29 @@ const RMSMakeInvoice = (props) => {
                     try {
                         await i_addData(obj);
                         progressCounter += step;
-                        setGenerateMultipleBillsProgressLong(progressCounter);
-                    } catch (error) {
+                        //setGenerateMultipleBillsProgressLong(progressCounter);
+                        circularProgressRef.current.innerHTML = `${Math.round(progressCounter)}%`;
+                    } catch (err) {
+                        console.log(err.message);
                         setRmsAlertMessage("Error");
                         setIsAlertShown(true);
+                        return;
                     }
                 }
             }
+            //set successfull ops notif 
+            setIsSuccessCreatingTagihanShow(true);
+            //set monthly invoice tracker
+            try {
+                await setDoc(doc(db, `monthlyInvoiceTracker/${activeDate.year}-${activeDate.month}/`), {
+                    "isGenerated": true
+                })
+            } catch (err) {
+                console.log(err.message);
+            }
             ic_st_setIsProgressShown(false);
-            setGenerateMultipleBillsProgressLong(0);
+            //setGenerateMultipleBillsProgressLong(0);
+            circularProgressRef.current.innerHTML = 0;
         }
     }
     return (
@@ -232,7 +263,10 @@ const RMSMakeInvoice = (props) => {
                         }} />
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Box sx={{ display: 'inline-flex' }}>
-                                <CircularProgressWithLabel value={generateMultipleBillsProgressLong} isVisible={ic_st_isProgressShown} />
+                                <CircularProgressWithLabel
+                                    isVisible={ic_st_isProgressShown} 
+                                    ref={circularProgressRef}
+                                    />
                             </Box>
                         </Box>
                         <Button sx={{ margin: "5px" }} variant={"contained"}
@@ -247,7 +281,6 @@ const RMSMakeInvoice = (props) => {
                                         setIsAlertShown(true);
                                     } else {
                                         await generateMultipleBills();
-                                        setIsSuccessCreatingTagihanShow(true);
                                     }
                                 }
                             }

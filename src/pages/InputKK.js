@@ -91,8 +91,7 @@ const InputKK = (props) => {
         getListKategori();
     }, []);
     const bulkUpload = async () => {
-        /**
-         * for (let i = 0; i < homeObj.length; i++) {
+        for (let i = 0; i < homeObj.length; i++) {
             try {
                 const docRef = await addDoc(collection(db, 'kk'), {
                     "blok": homeObj[i]['blok'],
@@ -110,7 +109,6 @@ const InputKK = (props) => {
                 }, 1000)
             }
         }
-         */
     }
     useEffect(() => {
         if (!isManuallyInputIKK) {
@@ -120,14 +118,12 @@ const InputKK = (props) => {
     return (
         <Box style={{ marginBottom: "20px" }}>
             <Paper>
-                {/**
-                 * <Box sx={{ padding: '10px' }}>
+                 <Box sx={{ padding: '10px' }}>
                     <Button variant={'contained'} onClick={() => {
                         bulkUpload();
                     }}>Bulk Upload</Button>
                     <Typography sx={{ marginLeft: '5px' }} variant={'caption'} ref={typoRef}>0</Typography>
                 </Box>
-                 */}
                 <Box sx={{ padding: '10px' }}>
                     <RMSSwitch label={'IKK berdasarkan kategori bangunan'} handleChange={(v) => { setBiayaBulanan([]); setIsManuallyInputIKK(!v) }} />
                 </Box>
