@@ -17,7 +17,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useReactToPrint } from 'react-to-print';
 //qr code
 import QRCode from "react-qr-code";
-import { defineMonthName, getSeparatedDate } from "../rms-utility/rms-utility";
+import { defineMonthName, getSeparatedDate, substractIkkReport } from "../rms-utility/rms-utility";
 //react router dom
 import { useParams } from 'react-router-dom';
 //rms
@@ -344,7 +344,17 @@ const RMSLihatInvoice = () => {
                 isCheckbox={ic_st_isCheckbox}
                 handleSelectionModelChange={(g) => ic_sf_setCurrentSelectedRowData(g)}
                 handleMultipleSelectionButton={() => { ic_st_setIsCheckbox(!ic_st_isCheckbox) }}
-                handleDeleteButton={() => { ic_af_deleteSelectedBills(ic_st_currentSelectedIDs) }}
+                handleDeleteButton={async () => {
+                    try {
+                        await ic_af_deleteSelectedBills(ic_st_currentSelectedIDs);
+                        for (let i = 0; i < ic_st_currentSelectedIDs.length; i++) {
+                            await substractIkkReport(ic_st_currentSelectedRowData[i]['status-tagihan'] === 'LUNAS' ? true : false, ic_st_currentSelectedRowData[i]['tahun'], ic_st_currentSelectedIDs[i])
+                            console.log(`data for ${ic_st_currentSelectedRowData[i]['tahun']} , id ${ic_st_currentSelectedIDs[i]} has been deleted`);
+                        }
+                    } catch (err) {
+                        console.log(err.message);
+                    }
+                }}
                 handleEditButton={async () => {
                     ic_st_setIsEditDialogOpen(true);
                 }}

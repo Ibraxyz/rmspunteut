@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, getDocs, collection, addDoc, where, query } from 'firebase/firestore';
+import { doc, setDoc, getDoc, getDocs, collection, addDoc, where, query, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from "../index";
 
 async function asyncForEach(array, callback) {
@@ -71,6 +71,28 @@ const defineMonthName = (month) => {
     }
     return name;
 }
+//const substractIkkReport
+const substractIkkReport = async (status, tahun, id) => {
+    //substract ikk report
+    if (status === false) {
+        console.log('invoice belum lunas jadi substract tidak dilakukan...');
+        return;
+    }
+    //get wanted doc
+    try {
+        await deleteDoc(doc(db, `ikk-report/${tahun}/data/${id}`));
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+const substractReport = async () => {
+    //substract per blok report
+    //substract merged report
+    //substract merged yearly report
+    //substract all time report
+}
+
 //create ikk report 
 const createIkkReport = async (tahun, bulan, blok, norumah, subtotal, biaya, currentUser) => {
     //tahun dan bulan disini merujuk pada periode kwitansi bukan pada tahun dan bulan saat ini
@@ -147,7 +169,13 @@ const createReport = async (blok, category, nominal, currentUser) => {
         const separatedDate = getSeparatedDate(Date.now());
         //per blok report
         //get the same collector and block doc first
-        const querySnapshot = await getDocs(collection(db, `per-blok-report/${separatedDate.year}/bulan/${separatedDate.month}/data/`), where('kolektor', '==', currentUser.uid), where('blok', '==', blok), where('kategori', "==", category));
+        const ref = collection(db, `per-blok-report/${separatedDate.year}/bulan/${separatedDate.month}/data/`);
+        const conditions = [
+            where('kolektor', '==', currentUser.uid),
+            where('blok', '==', blok),
+            where('kategori', "==", category)
+        ]
+        const querySnapshot = await getDocs(query(ref, ...conditions));
         let length = 0;
         let total = 0;
         let id = 0;
@@ -227,4 +255,4 @@ const createReport = async (blok, category, nominal, currentUser) => {
         alert(err.message);
     }
 }
-export { asyncForEach, formatRupiah, getSeparatedDate, defineMonthName, createReport, createIkkReport };
+export { asyncForEach, formatRupiah, getSeparatedDate, defineMonthName, createReport, createIkkReport, substractIkkReport };

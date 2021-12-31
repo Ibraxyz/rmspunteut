@@ -229,7 +229,7 @@ const RMSReport = (props) => {
             </Paper>
             {/** generated report total*/}
             <Grid container spacing={2}>
-                <Grid item sm={12} md={8}>
+                <Grid item xs={12} sm={12} md={8}>
                     <Paper>
                         {
                             ic_st_isProcessing ?
@@ -246,7 +246,7 @@ const RMSReport = (props) => {
                         </Box>
                     </Paper>
                 </Grid>
-                <Grid item sm={12} md={4}>
+                <Grid item xs={12} sm={12} md={4}>
                     <Paper sx={{ padding: '20px' }}>
                         <Stack direction={'column'} spacing={1} alignItems={'center'} >
                             <img src={ReportSVG} alt={""} style={{ width: '75%', height: 'auto', marginBottom: '20px', marginTop: '20px' }} />

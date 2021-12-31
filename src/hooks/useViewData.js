@@ -14,7 +14,7 @@ const useViewData = (arg_setFilterOptionsList, arg_st_setFilterOptionsList, targ
         for (let i = 0; i < ids.length; i++) {
             try {
                 console.log(`deleting data for id ${ids[i]} at iteration ${i}`);
-                await deleteDoc(doc(db, "tagihan", ids[i]));
+                await deleteDoc(doc(db, "invoice", ids[i]));
                 deletedIDs.push(ids[i]);
                 console.log(`[Success] data for id ${ids[i]} at iteration ${i} has been deleted...`);
             } catch (err) {
