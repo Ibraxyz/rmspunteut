@@ -154,7 +154,7 @@ const RMSPayInvoice = (props) => {
                                 h_sf_showSnackbar('Berhasil menambahkan laporan', 'success');
                                 //create ikk report
                                 if (ic_st_kategori === 'bulanan') {
-                                    await createIkkReport(ic_st_tahun, ic_st_bulan, ic_st_blok, ic_st_nomorRumah, ic_st_subTotal, ic_st_biaya, r_currentUser);
+                                    await createIkkReport(ic_st_tahun, ic_st_bulan, ic_st_blok, ic_st_nomorRumah, parseInt(ic_st_subTotal), parseInt(ic_st_biaya), r_currentUser);
                                     h_sf_showSnackbar('Berhasil menambahkan laporan IKK', 'success');
                                 }
                             } catch (err) {

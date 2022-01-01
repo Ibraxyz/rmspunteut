@@ -1,5 +1,6 @@
 import './App.css';
-import React, { useEffect, useState } from "react";
+import { getStorage, ref, uploadString } from "firebase/storage";
+import React, { useEffect, useState, useRef } from "react";
 import PrimarySearchAppBar from "./components/PrimarySearchAppBar";
 import LihatTagihan from './pages/LihatTagihan';
 import RMSBreadCrumbs from "./components/RMSBreadCrumbs";
@@ -32,6 +33,8 @@ import { defineMonthName, formatRupiah, getSeparatedDate, createReport, createIk
 import useSnackbar from './hooks/useSnackbar';
 //icons
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+//html to canvas
+import html2canvas from 'html2canvas';
 
 import {
   BrowserRouter as Router,
@@ -62,10 +65,19 @@ export const dark = {
 }
 
 function App() {
+  const storage = getStorage();
+  const storageRef = ref(storage, 'invoices');
+  //ref to generated invoice image
+  const invoiceImgRef = useRef();
   //use block hook
   //const [ic_st_blokItems] = useBlok();
   const [ic_st_blokItems, ic_st_setBlokItems] = useState([]);
   const [ic_st_an, ic_st_aazz, ic_st_tasbiII] = useGroupedSelect();
+  const [cache_blok, set_cache_blok] = useState({}); //caching blok no rumah for 'hemat quota'
+  //refresh blok no rumah list
+  const refreshBlokList = async () => {
+    //get latest update from db
+  }
   //effect
   useEffect(() => {
     const blocks = [];
@@ -107,13 +119,13 @@ function App() {
   const [ic_st_kmCurrentPaidInv, ic_st_setKmCurrentPaidInv] = useState([]);
   const [ic_st_waNumber, ic_st_setWaNumber] = useState('');
   const [ic_st_waMessage, ic_st_setWaMessage] = useState('TEST MSG');
-  const [ic_st_kmWaLink,ic_st_setKmWaLink] = useState("");
-  useEffect(()=>{
-    console.log(getWhatsappLink(ic_st_waNumber,ic_st_waMessage));
+  const [ic_st_kmWaLink, ic_st_setKmWaLink] = useState("");
+  useEffect(() => {
+    console.log(getWhatsappLink(ic_st_waNumber, ic_st_waMessage));
     ic_st_setKmWaLink(
-      getWhatsappLink(ic_st_waNumber,ic_st_waMessage)
+      getWhatsappLink(ic_st_waNumber, ic_st_waMessage)
     )
-  },[ic_st_waNumber,ic_st_waMessage])
+  }, [ic_st_waNumber, ic_st_waMessage])
   //snackbar
   const [h_st_isSnackbarShown, h_st_message, h_st_severity, h_sf_showSnackbar, h_sf_closeSnackbar] = useSnackbar();
   //firebase auth
@@ -137,7 +149,7 @@ function App() {
             ic_st_blokItems.map((blokItem) => {
               console.log('blokItem', JSON.stringify(blokItem));
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`kolektor-grid-blok-${blokItem.value}`}>
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`${Date.now()}-kolektor-grid-blok-${blokItem.value}`}>
                   <Paper onClick={() => { ic_st_setKmActiveView('nomor'); ic_st_kmSetSelectedBlok(blokItem.text) }}>
                     <Box sx={{ padding: '10px' }} textAlign={'center'}>
                       <Typography content={'div'} variant={'subtitle2'}>Blok</Typography>
@@ -213,52 +225,53 @@ function App() {
                           ic_st_kmSetSelectedBulan(null);
                           ic_st_kmSetSelectedTahun(null);
                           //update report
-                          await createReport(ic_st_kmSelectedBlok, inv['kategori'], inv['biaya'], r_currentUser);
+                          await createReport(ic_st_kmSelectedBlok, inv['kategori'], parseInt(inv['biaya']), r_currentUser);
                           h_sf_showSnackbar('Berhasil menambahkan laporan', 'success');
                           ic_st_setKmNomIsLoading(false)
                           //update ikk report if category is monthly
                           if (inv['kategori'] === 'bulanan') {
                             ic_st_setKmNomIsLoading(true);
-                            await createIkkReport(inv['tahun'], inv['bulan'], ic_st_kmSelectedBlok, inv['nomor-rumah'], inv['subtotal'], inv['biaya'], r_currentUser);
+                            await createIkkReport(inv['tahun'], inv['bulan'], ic_st_kmSelectedBlok, inv['nomor-rumah'], parseInt(inv['subtotal']), parseInt(inv['biaya']), r_currentUser);
                             h_sf_showSnackbar('Berhasil menambahkan laporan IKK', 'success');
                             ic_st_setKmNomIsLoading(false);
                           }
                           //show paid invoice dialog
                           ic_st_setIsKMCompleteDialogShown(true);
                           //map inv data to fit RMSINvoiceDetail input requirement
-                          inv.map((i) => {
-                            return {
-                              "id": i["id"],
-                              "kategori": i['kategori'],
-                              "status-invoice": i['status-invoice'] == true ? 'LUNAS' : 'BELUM LUNAS', //ok
-                              "nama-daftar-tagihan": JSON.stringify(i['nama-daftar-tagihan']), //ok
-                              "subtotal": i['subtotal'],
-                              "potongan": i['potongan'],
-                              "biaya": i['biaya'], //not available
-                              "banyak-biaya": i['banyak-biaya'],
-                              "sudah-dibayar": i['sudah-dibayar'], //not available
-                              "sisa": i['sisa'], //not available
-                              "status-tagihan": i['status-tagihan'] == true ? 'LUNAS' : 'BELUM LUNAS', //ok
-                              "status-kelompok-tagihan": i['status-kelompok-tagihan'] == true ? 'LUNAS' : 'BELUM LUNAS',
-                              "blok": i['blok'],
-                              "nomor-rumah": i['nomor-rumah'],
-                              "nomor-kk": i['nomor-kk'],
-                              "nomor-telpon": i['nomor-telpon'],
-                              "nomor-hp": i['nomor-hp'],
-                              "email": i['email'],
-                              "tanggal-dibuat": toDate(i['tanggal-dibuat']),
-                              "tanggal-aktif": toDate(i['tanggal-aktif']),
-                              "tanggal-dibayar": toDate(i['tanggal-dibayar']),
-                              "tagihan": JSON.stringify(i['tagihan']),
-                              "kolektor": i['kolektor'] === '-' ? '-' : JSON.stringify(i['kolektor']),
-                              "bulan": i['bulan'],
-                              "tahun": i['tahun']
+                          console.log('INV Inspect', JSON.stringify(inv)); //a single js obj
+                          const keys = Object.keys(inv);
+                          keys.forEach((k) => {
+                            if (k === 'status-invoice') {
+                              inv[k] = 'LUNAS';
+                            }
+                            if (k === 'nama-daftar-tagihan') {
+                              inv[k] = JSON.stringify(inv['nama-daftar-tagihan']);
+                            }
+                            if (k === 'status-tagihan') {
+                              inv[k] = 'LUNAS';
+                            }
+                            if (k === 'status-kelompok-tagihan') {
+                              inv[k] = 'LUNAS';
+                            }
+                            if (k === 'tanggal-dibuat') {
+                              inv[k] = toDate(inv['tanggal-dibuat'])
+                            }
+                            if (k === 'tanggal-aktif') {
+                              inv[k] = toDate(inv['tanggal-aktif'])
+                            }
+                            if (k === 'tanggal-dibayar') {
+                              inv[k] = toDate(inv['tanggal-dibayar'])
+                            }
+                            if (k === 'tagihan') {
+                              inv[k] = JSON.stringify(inv['tagihan'])
+                            }
+                            if (k === 'kolektor') {
+                              inv[k] = inv['kolektor'] === '-' ? '-' : JSON.stringify(inv['kolektor'])
                             }
                           })
-                          ic_st_setKmCurrentPaidInv(inv);
-                          //determine link to firestore storage
-                          let linkToStorage = "";
-                          ic_st_setWaMessage(linkToStorage);
+                          inv["sudah-dibayar"] = parseInt(inv['biaya']);
+                          inv["sisa"] = 0;
+                          ic_st_setKmCurrentPaidInv([inv]);
                         }
                         updateInv();
                       } catch (err) {
@@ -529,12 +542,22 @@ function App() {
   useEffect(() => {
     const getNumberList = async () => {
       try {
-        const kk = await getDocs(query(collection(db, 'kk'), where('blok', '==', ic_st_kmSelectedBlok), orderBy("no_rumah")));
-        const numberList = [];
-        kk.forEach((k) => {
-          console.log(k.data()['no_rumah'])
-          numberList.push(k.data()['no_rumah']);
-        })
+        let numberList = [];
+        //if cache not set yet, get it from db
+        if (cache_blok[ic_st_kmSelectedBlok] === null || cache_blok[ic_st_kmSelectedBlok] === undefined) {
+          h_sf_showSnackbar('getting data from db..', 'warning');
+          const kk = await getDocs(query(collection(db, 'kk'), where('blok', '==', ic_st_kmSelectedBlok), orderBy("no_rumah")));
+          kk.forEach((k) => {
+            console.log(k.data()['no_rumah'])
+            numberList.push(k.data()['no_rumah']);
+          })
+          const cacheObject = { ...cache_blok };
+          cacheObject[ic_st_kmSelectedBlok] = numberList;
+          set_cache_blok(cacheObject);
+        } else {
+          h_sf_showSnackbar('using cache', 'success');
+          numberList = cache_blok[ic_st_kmSelectedBlok]
+        }
         /** processing view */
         let view = [];
         numberList.forEach((n) => {
@@ -618,11 +641,12 @@ function App() {
             severity={h_st_severity}
             message={h_st_message} />
           {/** Paid Invoice Dialog (KM) ic_st_isKMCompleteDialogShown */}
-          <Dialog open={true}>
+          <Dialog open={ic_st_isKMCompleteDialogShown}>
             <DialogTitle>Bukti Pembayaran</DialogTitle>
             <Divider />
             <DialogContent>
               <RMSInvoiceDetail
+                ref={invoiceImgRef}
                 isOpen={true}
                 currentRow={ic_st_kmCurrentPaidInv}
                 handleBackButton={() => ic_st_setIsKMCompleteDialogShown(false)}
@@ -634,11 +658,59 @@ function App() {
             <DialogActions>
               <Stack direction={'column'}>
                 <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e) => { ic_st_setWaNumber(e.target.value) }}></TextField>
-                <a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}>
-                  <Button startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
-                    ic_st_setIsKMCompleteDialogShown(false);
-                  }}>Kirim ke WA</Button>
-                </a>
+                {/** <a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}> **/}
+                <Button startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
+                  ic_st_setIsKMCompleteDialogShown(false);
+                  //download the image first, in case we will need it later
+
+                  const downloadImage = async () => {
+                    const element = invoiceImgRef.current;
+                    const canvas = await html2canvas(element);
+                    console.log('IMG CANVAS INSPECT', canvas);
+                    const data = canvas.toDataURL('image/jpg');
+                    console.log('IMG DATA INSPECT', data);
+                    //upload to firebase storage
+                    try {
+                      uploadString(storageRef, data, 'data_url').then((snapshot) => {
+                        console.log('data url snapshot', snapshot);
+                        console.log('Uploaded a data_url string!');
+                      });
+                    } catch (err) {
+                      h_sf_showSnackbar(err.message, 'error');
+                      console.log(err.message);
+                    }
+                    const link = document.createElement('a');
+
+                    if (typeof link.download === 'string') {
+                      link.href = data;
+                      link.download = 'image.jpg';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    } else {
+                      window.open(data);
+                    }
+                  };
+
+                  const sendToWa = () => {
+                    const link = document.createElement('a');
+                    link.href = ic_st_kmWaLink;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    //determine link to firestore storage
+                    let linkToStorage = "";
+                    ic_st_setWaMessage(linkToStorage);
+                  }
+
+                  const finishProcess = async () => {
+                    await downloadImage();
+                    //sendToWa();
+                  }
+
+                  finishProcess();
+                }}>Kirim ke WA</Button>
+                {/** </a> */}
               </Stack>
             </DialogActions>
           </Dialog>
