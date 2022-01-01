@@ -225,6 +225,7 @@ function App() {
                           }
                           //show paid invoice dialog
                           ic_st_setIsKMCompleteDialogShown(true);
+                          //map inv data to fit RMSINvoiceDetail input requirement
                           inv.map((i) => {
                             return {
                               "id": i["id"],
@@ -255,7 +256,9 @@ function App() {
                             }
                           })
                           ic_st_setKmCurrentPaidInv(inv);
-                          ic_st_setWaMessage("");
+                          //determine link to firestore storage
+                          let linkToStorage = "";
+                          ic_st_setWaMessage(linkToStorage);
                         }
                         updateInv();
                       } catch (err) {
