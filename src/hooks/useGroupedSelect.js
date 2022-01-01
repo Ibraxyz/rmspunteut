@@ -37,6 +37,11 @@ const useGroupedSelect = () => {
                 ic_st_setAn(an);
                 ic_st_setTasbiII(tasbi2);
             } catch (err) {
+                if(err.message === 'Quota exceeded.'){
+                    alert('Kuota penggunaan aplikasi sudah habis untuk hari ini.')
+                }else{
+                    alert(err.message);
+                }
                 console.log(err.message);
             }
         }

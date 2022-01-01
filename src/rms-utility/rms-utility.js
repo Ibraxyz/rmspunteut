@@ -181,6 +181,13 @@ const createIkkReport = async (tahun, bulan, blok, norumah, subtotal, biaya, cur
     await addDoc(collection(db, `ikk-report/${tahun}/data/`), obj);
 }
 
+//get whatsapp link
+const getWhatsappLink = (yourNumber,yourMessage) => {
+    let number = '+62' + yourNumber.substring(1);
+    let message = yourMessage.split(' ').join('%20')
+    return 'https://api.whatsapp.com/send?phone=' + number + '&text=%20' + message;
+}
+
 //create report
 const createReport = async (blok, category, nominal, currentUser) => {
     try {
@@ -274,4 +281,4 @@ const createReport = async (blok, category, nominal, currentUser) => {
         alert(err.message);
     }
 }
-export { asyncForEach, formatRupiah, getSeparatedDate, defineMonthName, createReport, createIkkReport, substractIkkReport, substractReport };
+export { asyncForEach, formatRupiah, getSeparatedDate, defineMonthName, createReport, createIkkReport, substractIkkReport, substractReport, getWhatsappLink };

@@ -17,7 +17,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useReactToPrint } from 'react-to-print';
 //qr code
 import QRCode from "react-qr-code";
-import { defineMonthName, getSeparatedDate, substractIkkReport } from "../rms-utility/rms-utility";
+import { defineMonthName, getSeparatedDate, substractIkkReport, substractReport } from "../rms-utility/rms-utility";
 //react router dom
 import { useParams } from 'react-router-dom';
 //rms
@@ -27,7 +27,6 @@ import { setDoc, doc } from 'firebase/firestore';
 //redux
 import { useSelector } from "react-redux";
 //utility
-import { createReport } from "../rms-utility/rms-utility";
 import useBloks from "../hooks/useBloks";
 
 //inner component

@@ -15,10 +15,11 @@ const RMSDataDisplay = (props) => {
     const [ic_st_isMultipleSelectModeActive, ic_st_setIsMultipleSelectModeActive] = useState(false);
     const ic_sf_inspectIDsStatus = (id) => {
         const filtered = props.rows.filter((row) => {
-            return row['id'] === id
+            return row['id'] === id 
         })
         try {
-            let statusTagihan = filtered[0]['status-invoice'] === 'BELUM LUNAS' || filtered[0]['status-invoice'] === false ? false : true;
+            let statusTagihan = (filtered[0]['status-invoice'] === 'BELUM LUNAS' || filtered[0]['status-invoice'] === false) && (filtered[0]['biaya'] !== 'EMPTY' && filtered[0]['biaya'] !== 'TMB' && filtered[0]['biaya'] !== 'RK') ? false : true;
+            console.log('statusTagihan',statusTagihan);
             return statusTagihan;
         } catch (err) {
             console.log(err.message);

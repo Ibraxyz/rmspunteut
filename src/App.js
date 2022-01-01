@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import PrimarySearchAppBar from "./components/PrimarySearchAppBar";
 import LihatTagihan from './pages/LihatTagihan';
 import RMSBreadCrumbs from "./components/RMSBreadCrumbs";
-import { Container, Snackbar } from "@mui/material";
+import { Container, Snackbar, Skeleton, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
 import RMSTempDrawer from "./components/RMSTempDrawer";
 import BuatTagihan from "./pages/BuatTagihan";
 import Beranda from "./pages/Beranda";
@@ -27,9 +27,11 @@ import { Paper, LinearProgress, Typography, Button, Box, Divider, Grid, Stack } 
 //rms
 import RMSSnackbar from './components/RMSSnackbar';
 //utililty
-import { defineMonthName, formatRupiah, getSeparatedDate, createReport, createIkkReport } from './rms-utility/rms-utility';
+import { defineMonthName, formatRupiah, getSeparatedDate, createReport, createIkkReport, getWhatsappLink } from './rms-utility/rms-utility';
 //hooks
 import useSnackbar from './hooks/useSnackbar';
+//icons
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 import {
   BrowserRouter as Router,
@@ -44,6 +46,9 @@ import RMSPengaturanBiaya from './pages/RMSPengaturanBiaya';
 import RMSBuatInvoiceUmum from './pages/RMSBuatInvoiceUmum';
 import RMSReport from './pages/RMSReport';
 import useBlok from './hooks/useBloks';
+import useGroupedSelect from './hooks/useGroupedSelect';
+import RMSInvoiceDetail from './components/RMSInvoiceDetail';
+import { toDate } from 'date-fns';
 
 export const light = {
   palette: {
@@ -58,7 +63,26 @@ export const dark = {
 
 function App() {
   //use block hook
-  const [ic_st_blokItems] = useBlok();
+  //const [ic_st_blokItems] = useBlok();
+  const [ic_st_blokItems, ic_st_setBlokItems] = useState([]);
+  const [ic_st_an, ic_st_aazz, ic_st_tasbiII] = useGroupedSelect();
+  //effect
+  useEffect(() => {
+    const blocks = [];
+    ic_st_an.forEach((an) => {
+      console.log(JSON.stringify(an));
+      blocks.push(an);
+    })
+    ic_st_aazz.forEach((aazz) => {
+      console.log(JSON.stringify(aazz));
+      blocks.push(aazz);
+    })
+    ic_st_tasbiII.forEach((tasbi2) => {
+      console.log(JSON.stringify(tasbi2));
+      blocks.push(tasbi2);
+    })
+    ic_st_setBlokItems(blocks);
+  }, [ic_st_an, ic_st_aazz, ic_st_tasbiII])
   //redux 
   const dispatch = useDispatch();
   const { updateCurrentLoginStatus, updateCurrentUser } = bindActionCreators(actionCreators, dispatch);
@@ -78,6 +102,18 @@ function App() {
   const [ic_st_numberListOpsView, ic_st_setNumberListOpsView] = useState([]);
   const [ic_st_isLoading, ic_st_setIsLoading] = useState(false);
   const [ic_st_nomList, ic_st_setNomList] = useState([]);
+  const [ic_st_kmNomIsLoading, ic_st_setKmNomIsLoading] = useState(false);
+  const [ic_st_isKMCompleteDialogShown, ic_st_setIsKMCompleteDialogShown] = useState(false);
+  const [ic_st_kmCurrentPaidInv, ic_st_setKmCurrentPaidInv] = useState([]);
+  const [ic_st_waNumber, ic_st_setWaNumber] = useState('');
+  const [ic_st_waMessage, ic_st_setWaMessage] = useState('TEST MSG');
+  const [ic_st_kmWaLink,ic_st_setKmWaLink] = useState("");
+  useEffect(()=>{
+    console.log(getWhatsappLink(ic_st_waNumber,ic_st_waMessage));
+    ic_st_setKmWaLink(
+      getWhatsappLink(ic_st_waNumber,ic_st_waMessage)
+    )
+  },[ic_st_waNumber,ic_st_waMessage])
   //snackbar
   const [h_st_isSnackbarShown, h_st_message, h_st_severity, h_sf_showSnackbar, h_sf_closeSnackbar] = useSnackbar();
   //firebase auth
@@ -96,11 +132,12 @@ function App() {
   const ic_sf_decideKMView = (type) => {
     if (type === 'blok') {
       return (
-        <Grid container spacing={5}>
+        <Grid container spacing={3}>
           {
             ic_st_blokItems.map((blokItem) => {
+              console.log('blokItem', JSON.stringify(blokItem));
               return (
-                <Grid item xs={6} md={4} lg={3} xl={2} key={`kolektor-grid-blok-${blokItem.value}`}>
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`kolektor-grid-blok-${blokItem.value}`}>
                   <Paper onClick={() => { ic_st_setKmActiveView('nomor'); ic_st_kmSetSelectedBlok(blokItem.text) }}>
                     <Box sx={{ padding: '10px' }} textAlign={'center'}>
                       <Typography content={'div'} variant={'subtitle2'}>Blok</Typography>
@@ -128,81 +165,128 @@ function App() {
       return (
         <Grid container spacing={5}>
           {
-            ic_st_nomList.map((nominal) => {
+            ic_st_nomList.map((inv) => {
               return (
-                <Grid item xs={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-${nominal}`}>
-                  <Paper onClick={() => {
-                    const getInvoice = async () => {
+                ic_st_kmNomIsLoading ?
+                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-loading-${inv}`}>
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                  </Grid>
+                  :
+                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-${inv}`}>
+                    <Paper onClick={() => {
+                      //test 
+                      ic_st_setKmNomIsLoading(true);
+                      //check the inv object
+                      console.log(JSON.stringify(inv))
+                      //prevent pay a paid invoice / RK/ TMB/ EMPTY
+                      if (inv['status-invoice'] !== false || inv['biaya'] === 'EMPTY' || inv['biaya'] === 'TMB' || inv['biaya'] === 'RK') {
+                        h_sf_showSnackbar('Invoice ini tidak bisa di bayar karena sudah lunas / RK / TMB / EMPTY', 'error');
+                        ic_st_setKmNomIsLoading(false);
+                        return;
+                      }
+                      //update the invoice to be paid
                       try {
-                        setIsLoading(true);
-                        console.log('Getting invoices...')
-                        const q = query(collection(db, "invoice"), where("blok", "==", ic_st_kmSelectedBlok), where("nomor-rumah", "==", `${ic_st_kmSelectedNomor}`), where("bulan", "==", ic_st_kmSelectedBulan), where("tahun", "==", ic_st_kmSelectedTahun), where("status-invoice", "==", false))
-                        const querySnapshot = await getDocs(q);
-                        const invoices = [];
-                        querySnapshot.forEach((doc) => {
-                          console.log(doc.id, " => ", doc.data());
-                          invoices.push({ id: doc.id, ...doc.data() });
-                        });
-                        console.log(`invoices result : ${JSON.stringify(invoices)}`)
-                        if (invoices.length === 0) {
-                          //alert('tidak ada data');
-                          h_sf_showSnackbar('Tidak ada data', 'error');
-                          setIsLoading(false);
-                        } else if (invoices.length > 1) {
-                          h_sf_showSnackbar('Invoice lebih dari satu', 'error');
-                          setIsLoading(false);
-                        } else {
-                          //prevent updating paid bills
-                          if (invoices['status-invoice'] === true) {
-                            h_sf_showSnackbar(`Tagihan untuk ${invoices[0]['blok']} no. ${invoices[0]['nomor-rumah']} untuk bulan ${defineMonthName(invoices[0]['bulan'])} tahun ${invoices[0]['tahun']} sudah LUNAS`, 'error')
-                            return;
-                          }
-                          //update document
-                          await updateDoc(doc(db, "invoice", invoices[0]['id']), {
+                        const updateInv = async () => {
+                          await updateDoc(doc(db, "invoice", inv['id']), {
                             'blok': ic_st_kmSelectedBlok,
                             'nomor-rumah': ic_st_kmSelectedNomor,
-                            'biaya': nominal,
-                            'dibayar': nominal,
+                            'biaya': inv['biaya'],
+                            'dibayar': inv['biaya'],
                             'sisa': 0,
                             'tanggal-dibayar': Date.now(),
                             'kolektor': r_currentUser,
                             'status-invoice': true,
                           });
-                          h_sf_showSnackbar(`Tagihan untuk ${invoices[0]['blok']} no. ${invoices[0]['nomor-rumah']} untuk bulan ${defineMonthName(invoices[0]['bulan'])} tahun ${invoices[0]['tahun']} sudah LUNAS`, 'success')
+                          h_sf_showSnackbar(`Tagihan ${inv['kategori']} untuk blok ${inv['blok']} no. ${inv['nomor-rumah']} telah LUNAS`, 'success')
                           //reset states
                           ic_st_setKmActiveView('blok');
                           ic_st_kmSetSelectedBlok(null);
                           ic_st_kmSetSelectedNomor(null);
                           ic_st_kmSetSelectedBulan(null);
-                          ic_st_kmSelectedTahun(null);
-                          setIsLoading(false);
+                          ic_st_kmSetSelectedTahun(null);
+                          //update report
+                          await createReport(ic_st_kmSelectedBlok, inv['kategori'], inv['biaya'], r_currentUser);
+                          h_sf_showSnackbar('Berhasil menambahkan laporan', 'success');
+                          ic_st_setKmNomIsLoading(false)
+                          //update ikk report if category is monthly
+                          if (inv['kategori'] === 'bulanan') {
+                            ic_st_setKmNomIsLoading(true);
+                            await createIkkReport(inv['tahun'], inv['bulan'], ic_st_kmSelectedBlok, inv['nomor-rumah'], inv['subtotal'], inv['biaya'], r_currentUser);
+                            h_sf_showSnackbar('Berhasil menambahkan laporan IKK', 'success');
+                            ic_st_setKmNomIsLoading(false);
+                          }
+                          //show paid invoice dialog
+                          ic_st_setIsKMCompleteDialogShown(true);
+                          inv.map((i) => {
+                            return {
+                              "id": i["id"],
+                              "kategori": i['kategori'],
+                              "status-invoice": i['status-invoice'] == true ? 'LUNAS' : 'BELUM LUNAS', //ok
+                              "nama-daftar-tagihan": JSON.stringify(i['nama-daftar-tagihan']), //ok
+                              "subtotal": i['subtotal'],
+                              "potongan": i['potongan'],
+                              "biaya": i['biaya'], //not available
+                              "banyak-biaya": i['banyak-biaya'],
+                              "sudah-dibayar": i['sudah-dibayar'], //not available
+                              "sisa": i['sisa'], //not available
+                              "status-tagihan": i['status-tagihan'] == true ? 'LUNAS' : 'BELUM LUNAS', //ok
+                              "status-kelompok-tagihan": i['status-kelompok-tagihan'] == true ? 'LUNAS' : 'BELUM LUNAS',
+                              "blok": i['blok'],
+                              "nomor-rumah": i['nomor-rumah'],
+                              "nomor-kk": i['nomor-kk'],
+                              "nomor-telpon": i['nomor-telpon'],
+                              "nomor-hp": i['nomor-hp'],
+                              "email": i['email'],
+                              "tanggal-dibuat": toDate(i['tanggal-dibuat']),
+                              "tanggal-aktif": toDate(i['tanggal-aktif']),
+                              "tanggal-dibayar": toDate(i['tanggal-dibayar']),
+                              "tagihan": JSON.stringify(i['tagihan']),
+                              "kolektor": i['kolektor'] === '-' ? '-' : JSON.stringify(i['kolektor']),
+                              "bulan": i['bulan'],
+                              "tahun": i['tahun']
+                            }
+                          })
+                          ic_st_setKmCurrentPaidInv(inv);
+                          ic_st_setWaMessage("");
                         }
-                        //create report
-                        await createReport(ic_st_kmSelectedBlok, 'bulanan', nominal, r_currentUser);
-                        h_sf_showSnackbar('Berhasil menambahkan laporan', 'success');
-                        //create ikk report
-                        await createIkkReport(invoices[0]['tahun'], invoices[0]['bulan'], ic_st_kmSelectedBlok, invoices[0]['nomor-rumah'], invoices[0]['subtotal'], invoices[0]['biaya'], r_currentUser);
-                        h_sf_showSnackbar('Berhasil menambahkan laporan IKK', 'success');
+                        updateInv();
                       } catch (err) {
-                        console.log(err.message);
-                        setIsLoading(false);
+                        h_sf_showSnackbar(err.message, 'error');
+                        ic_st_setKmNomIsLoading(false);
                       }
-                    }
-                    if (isLoading === true) {
-                      h_sf_showSnackbar('Sedang proses...', 'warning')
-                    } else {
-                      getInvoice();
-                    }
-                  }}>
-                    <Box sx={{ padding: '10px' }} textAlign={'center'}>
-                      <Typography content={'div'} variant={'subtitle2'}>Bayar</Typography>
-                    </Box>
-                    <Divider />
-                    <Box sx={{ padding: '10px' }} textAlign={'center'}>
-                      <Typography content={'div'} variant={'h2'}>{formatRupiah(nominal)}</Typography>
-                    </Box>
-                  </Paper>
-                </Grid>
+                    }}>
+                      <Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        {
+                          inv['status-invoice'] === false ? <Typography content={'div'} variant={'subtitle2'} sx={{ color: 'red' }}>Bayar</Typography>
+                            :
+                            <Typography sx={{ color: 'green' }} content={'div'} variant={'subtitle2'}>{`Sudah Lunas`}</Typography>
+                        }
+                      </Box>
+                      <Divider />
+                      <Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        {
+                          inv['nama-daftar-tagihan'].map((n) => <Typography key={n + Date.now()} content={'div'} variant={'caption'}>{n}</Typography>)
+                        }
+                      </Box>
+                      <Divider />
+                      <Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        {
+                          inv['biaya'] === 'EMPTY' || inv['biaya'] === 'TMB' || inv['biaya'] === 'RK' ?
+                            <Typography content={'div'} variant={'h2'}>{inv['biaya']}</Typography>
+                            :
+                            <Typography content={'div'} variant={'h2'}>{formatRupiah(parseInt(inv['biaya']))}</Typography>
+                        }
+                      </Box>
+                    </Paper>
+                  </Grid>
               )
             })
           }
@@ -442,7 +526,7 @@ function App() {
   useEffect(() => {
     const getNumberList = async () => {
       try {
-        const kk = await getDocs(query(collection(db, 'kk'), where('blok', '==', ic_st_kmSelectedBlok)));
+        const kk = await getDocs(query(collection(db, 'kk'), where('blok', '==', ic_st_kmSelectedBlok), orderBy("no_rumah")));
         const numberList = [];
         kk.forEach((k) => {
           console.log(k.data()['no_rumah'])
@@ -453,7 +537,7 @@ function App() {
         numberList.forEach((n) => {
           //alert(n)
           view.push(
-            <Grid item xs={6} md={4} lg={3} xl={2} key={`kolektor-grid-nomor-${n}`}>
+            <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`kolektor-grid-nomor-${n}`}>
               <Paper onClick={() => { ic_st_setKmActiveView('bulan'); ic_st_kmSetSelectedNomor(n) }}>
                 <Box sx={{ padding: '10px' }} textAlign={'center'}>
                   <Typography content={'div'} variant={'subtitle2'}>Nomor</Typography>
@@ -477,6 +561,7 @@ function App() {
   }, ic_st_kmSelectedBlok)
   useEffect(() => {
     const getNominalList = async () => {
+      ic_st_setKmNomIsLoading(true);
       try {
         let nomList = [];
         const conditions = [
@@ -488,11 +573,13 @@ function App() {
         ]
         const nominalList = await getDocs(query(collection(db, 'invoice'), ...conditions))
         nominalList.forEach((nom) => {
-          nomList.push(nom.data()['biaya'])
+          nomList.push({ id: nom.id, ...nom.data() })
         });
         ic_st_setNomList(nomList);
+        ic_st_setKmNomIsLoading(false);
       } catch (err) {
         console.log(err.message);
+        ic_st_setKmNomIsLoading(false);
       }
     }
     if (ic_st_kmSelectedTahun != null) {
@@ -500,7 +587,7 @@ function App() {
     }
   }, [ic_st_kmSelectedTahun])
   onAuthStateChanged(auth, (user) => {
-    try{
+    try {
       if (user) { //user is signed in
         console.log('onAuthStateChanged get called');
         ic_st_setUser(user);
@@ -508,9 +595,9 @@ function App() {
         // User is signed out
         ic_st_setUser(null);
       }
-    }catch(err){
+    } catch (err) {
       console.log(err.message);
-      h_sf_showSnackbar(err.message,'error');
+      h_sf_showSnackbar(err.message, 'error');
     }
   });
   return (
@@ -527,6 +614,31 @@ function App() {
             handleClose={() => h_sf_closeSnackbar()}
             severity={h_st_severity}
             message={h_st_message} />
+          {/** Paid Invoice Dialog (KM) ic_st_isKMCompleteDialogShown */}
+          <Dialog open={true}>
+            <DialogTitle>Bukti Pembayaran</DialogTitle>
+            <Divider />
+            <DialogContent>
+              <RMSInvoiceDetail
+                isOpen={true}
+                currentRow={ic_st_kmCurrentPaidInv}
+                handleBackButton={() => ic_st_setIsKMCompleteDialogShown(false)}
+              >
+                {/** <QRCode size={64} value={ic_st_currentSelectedRowData.length > 0 ? ic_sf_constructQRData() : 'invalid'} /> */}
+              </RMSInvoiceDetail>
+            </DialogContent>
+            <Divider />
+            <DialogActions>
+              <Stack direction={'column'}>
+                <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e) => { ic_st_setWaNumber(e.target.value) }}></TextField>
+                <a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}>
+                  <Button startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
+                    ic_st_setIsKMCompleteDialogShown(false);
+                  }}>Kirim ke WA</Button>
+                </a>
+              </Stack>
+            </DialogActions>
+          </Dialog>
         </Box>
       }
     </>

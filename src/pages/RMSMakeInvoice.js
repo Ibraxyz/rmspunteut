@@ -154,6 +154,7 @@ const RMSMakeInvoice = (props) => {
             console.log('tanggal aktif length', tanggalAktif.length);
             if (tanggalAktif === "" || tanggalAktif.length === 0) {
                 alert('Tanggal harus dipilih terlebih dahulu');
+                ic_st_setIsProgressShown(false);
                 return;
             }
             //tanggal aktif
@@ -163,6 +164,7 @@ const RMSMakeInvoice = (props) => {
                 const docSnap = await getDoc(doc(db, `monthlyInvoiceTracker/${activeDate.year}-${activeDate.month}/`));
                 if (docSnap.exists()) {
                     alert('Invoice bulanan untuk bulan dan tahun ini sudah di cetak.Apabila anda mencetak lagi maka akan terjadi duplikasi data invoice.. untuk mengedit invoice dapat melalui menu lihat invoice > hapus invoice , buat invoice umum > kategori bulanan');
+                    ic_st_setIsProgressShown(false);
                     return;
                 }
             } catch (err) {
@@ -176,6 +178,7 @@ const RMSMakeInvoice = (props) => {
             if (k_data.length == 0) {
                 setRmsAlertMessage(`Tidak ada data ${k_data.length === 0 ? 'kk dan tagihan' : k_data.length === 0 ? 'kk' : 'tagihan'}`);
                 setIsAlertShown(true);
+                ic_st_setIsProgressShown(false);
                 return;
             } else {
                 console.log("generating multiple bills...");
@@ -192,64 +195,56 @@ const RMSMakeInvoice = (props) => {
                     return;
                 }
                 for (var i = 0; i < k_data.length; i++) { //iterate over kk : k_data.length
-                    if (k_data['biaya-bulanan'] === 'TMB' || k_data['biaya-bulanan'] === 'RK' || k_data['biaya-bulanan'] === 'EMPTY') {
-                        //do nothing
-                        console.log('ikk is RK/TMB/EMPTY so not created..');
+                    let totalBiaya = k_data[i]['biaya-bulanan'];
+                    let namaDaftarTagihan = [bb.data().jenis];
+                    let tagihanObject = [
+                        {
+                            biaya: totalBiaya,
+                            id: idBiaya_,
+                            jenis: bb.data().jenis,
+                            qty: "1"
+                        }
+                    ]
+                    //---------------------------------------------------------------------------------------------------
+                    obj["subtotal"] = totalBiaya;
+                    obj["potongan"] = 0;
+                    obj["biaya"] = totalBiaya;
+                    obj['banyak-biaya'] = 1;
+                    obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok;
+                    obj["email"] = k_data[i].email === undefined ? "undefined" : k_data[i].email;
+                    obj["tagihan"] = tagihanObject;
+                    obj["nama-daftar-tagihan"] = namaDaftarTagihan.filter((daftar) => {
+                        console.log(daftar);
+                        return daftar !== undefined;
+                    });;
+                    obj["nomor-kk"] = k_data[i].no_kk === undefined ? "undefined" : k_data[i].no_kk;
+                    obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah;
+                    obj["sisa"] = totalBiaya;
+                    obj["status-invoice"] = false;
+                    obj["sudah-dibayar"] = 0;
+                    obj["tanggal-aktif"] = getTime(tanggalAktif);
+                    obj["tanggal-dibayar"] = getTime(tanggalDibayar);
+                    obj["tanggal-dibuat"] = Date.now();
+                    obj["nomor-telpon"] = k_data[i].telp === undefined ? "undefined" : k_data[i].telp;
+                    obj["nomor-hp"] = k_data[i].hp === undefined ? "undefined" : k_data[i].hp;
+                    obj["kolektor"] = '-';
+                    obj['bulan'] = activeDate.month;
+                    obj['tahun'] = activeDate.year;
+                    obj['hari'] = activeDate.day;
+                    obj['kategori'] = 'bulanan';
+                    //obj['bulan'] = nowDa
+                    try {
+                        console.log(obj);
+                        await i_addData(obj);
                         progressCounter += step;
                         //setGenerateMultipleBillsProgressLong(progressCounter);
                         circularProgressRef.current.innerHTML = `Progress : ${Math.round(progressCounter)}%`;
-                    } else {
-                        let totalBiaya = k_data[i]['biaya-bulanan'];
-                        let namaDaftarTagihan = [bb.data().jenis];
-                        let tagihanObject = [
-                            {
-                                biaya: totalBiaya,
-                                id: idBiaya_,
-                                jenis: bb.data().jenis,
-                                qty: "1"
-                            }
-                        ]
-                        //---------------------------------------------------------------------------------------------------
-                        obj["subtotal"] = totalBiaya;
-                        obj["potongan"] = 0;
-                        obj["biaya"] = totalBiaya;
-                        obj['banyak-biaya'] = 1;
-                        obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok;
-                        obj["email"] = k_data[i].email === undefined ? "undefined" : k_data[i].email;
-                        obj["tagihan"] = tagihanObject;
-                        obj["nama-daftar-tagihan"] = namaDaftarTagihan.filter((daftar) => {
-                            console.log(daftar);
-                            return daftar !== undefined;
-                        });;
-                        obj["nomor-kk"] = k_data[i].no_kk === undefined ? "undefined" : k_data[i].no_kk;
-                        obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah;
-                        obj["sisa"] = totalBiaya;
-                        obj["status-invoice"] = false;
-                        obj["sudah-dibayar"] = 0;
-                        obj["tanggal-aktif"] = getTime(tanggalAktif);
-                        obj["tanggal-dibayar"] = getTime(tanggalDibayar);
-                        obj["tanggal-dibuat"] = Date.now();
-                        obj["nomor-telpon"] = k_data[i].telp === undefined ? "undefined" : k_data[i].telp;
-                        obj["nomor-hp"] = k_data[i].hp === undefined ? "undefined" : k_data[i].hp;
-                        obj["kolektor"] = '-';
-                        obj['bulan'] = activeDate.month;
-                        obj['tahun'] = activeDate.year;
-                        obj['hari'] = activeDate.day;
-                        obj['kategori'] = 'bulanan';
-                        //obj['bulan'] = nowDa
-                        try {
-                            console.log(obj);
-                            await i_addData(obj);
-                            progressCounter += step;
-                            //setGenerateMultipleBillsProgressLong(progressCounter);
-                            circularProgressRef.current.innerHTML = `Progress : ${Math.round(progressCounter)}%`;
-                        } catch (err) {
-                            console.log(err.message);
-                            setRmsAlertMessage("Error");
-                            setIsAlertShown(true);
-                            console.log('error occured so BREAKED OPERATION');
-                            break;
-                        }
+                    } catch (err) {
+                        console.log(err.message);
+                        setRmsAlertMessage("Error");
+                        setIsAlertShown(true);
+                        console.log('error occured so BREAKED OPERATION');
+                        break;
                     }
                 }
                 //set successfull ops notif 
@@ -291,6 +286,7 @@ const RMSMakeInvoice = (props) => {
                             </Box>
                         </Box>
                         <Button sx={{ margin: "5px" }} variant={"contained"}
+                            disabled={ic_st_isProgressShown}
                             onClick={
                                 async () => {
                                     //alert(tanggalMulai);
