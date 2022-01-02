@@ -181,7 +181,7 @@ function App() {
             ic_st_nomList.map((inv) => {
               return (
                 ic_st_kmNomIsLoading ?
-                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-loading-${inv}`}>
+                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-loading-${inv.id}`}>
                     <Skeleton variant="text" />
                     <Skeleton variant="text" />
                     <Skeleton variant="text" />
@@ -193,7 +193,7 @@ function App() {
                     <Skeleton variant="text" />
                   </Grid>
                   :
-                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-${inv}`}>
+                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-${inv.id}`}>
                     <Paper onClick={() => {
                       //test 
                       ic_st_setKmNomIsLoading(true);
@@ -286,6 +286,10 @@ function App() {
                             :
                             <Typography sx={{ color: 'green' }} content={'div'} variant={'subtitle2'}>{`Sudah Lunas`}</Typography>
                         }
+                      </Box>
+                      <Divider />
+                      <Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        <Typography variant={'caption'}>{inv.id}</Typography>
                       </Box>
                       <Divider />
                       <Box sx={{ padding: '10px' }} textAlign={'center'}>
