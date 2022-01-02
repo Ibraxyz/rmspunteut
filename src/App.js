@@ -52,6 +52,7 @@ import useBlok from './hooks/useBloks';
 import useGroupedSelect from './hooks/useGroupedSelect';
 import RMSInvoiceDetail from './components/RMSInvoiceDetail';
 import { toDate } from 'date-fns';
+import md5 from 'md5';
 
 export const light = {
   palette: {
@@ -149,7 +150,7 @@ function App() {
             ic_st_blokItems.map((blokItem) => {
               console.log('blokItem', JSON.stringify(blokItem));
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`${Date.now()}-kolektor-grid-blok-${blokItem.value}`}>
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`-kolektor-grid-blok-${md5(blokItem.value + Date.now())}`}>
                   <Paper onClick={() => { ic_st_setKmActiveView('nomor'); ic_st_kmSetSelectedBlok(blokItem.text) }}>
                     <Box sx={{ padding: '10px' }} textAlign={'center'}>
                       <Typography content={'div'} variant={'subtitle2'}>Blok</Typography>
@@ -560,21 +561,29 @@ function App() {
         }
         /** processing view */
         let view = [];
+        const nArr = []; //array that help check for duplicating nomor-rumah
         numberList.forEach((n) => {
           //alert(n)
-          view.push(
-            <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`kolektor-grid-nomor-${n}`}>
-              <Paper onClick={() => { ic_st_setKmActiveView('bulan'); ic_st_kmSetSelectedNomor(n) }}>
-                <Box sx={{ padding: '10px' }} textAlign={'center'}>
-                  <Typography content={'div'} variant={'subtitle2'}>Nomor</Typography>
-                </Box>
-                <Divider />
-                <Box sx={{ padding: '10px' }} textAlign={'center'}>
-                  <Typography content={'div'} variant={'h2'}>{n}</Typography>
-                </Box>
-              </Paper>
-            </Grid>
-          )
+          //filter out same nomor rumah
+          if (nArr.includes(n)) {
+            //the number already pushed,.. so the view will not displaying it
+            console.log('the number already pushed,.. so the view will not displaying it');
+          } else {
+            nArr.push(n);
+            view.push(
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`-kolektor-grid-nomor-${md5(n + Date.now())}`}>
+                <Paper onClick={() => { ic_st_setKmActiveView('bulan'); ic_st_kmSetSelectedNomor(n) }}>
+                  <Box sx={{ padding: '10px' }} textAlign={'center'}>
+                    <Typography content={'div'} variant={'subtitle2'}>Nomor</Typography>
+                  </Box>
+                  <Divider />
+                  <Box sx={{ padding: '10px' }} textAlign={'center'}>
+                    <Typography content={'div'} variant={'h2'}>{n}</Typography>
+                  </Box>
+                </Paper>
+              </Grid>
+            )
+          }
         })
         ic_st_setNumberListOpsView(view);
       } catch (err) {

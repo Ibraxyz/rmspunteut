@@ -282,3 +282,80 @@ const createReport = async (blok, category, nominal, currentUser) => {
     }
 }
 export { asyncForEach, formatRupiah, getSeparatedDate, defineMonthName, createReport, createIkkReport, substractIkkReport, substractReport, getWhatsappLink };
+
+/**F
+22
+EMPTY
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+51
+70000
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+29
+100000
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+19
+EMPTY
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+40
+150000
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+59
+RK
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+45
+100000
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+06
+RK
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+72
+200000
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+F
+60
+250000
+BELUM LUNAS
+1
+2022
+Sat Jan 01 2022 16:52:39 GMT+0700 (Western Indonesia Time)
+Rows per page:
+
+100
+1-77 of 77
+
+ */
