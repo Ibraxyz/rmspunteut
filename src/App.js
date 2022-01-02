@@ -673,7 +673,11 @@ function App() {
                 <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e)=>ic_st_setWaNUmberFIx(e.target.value)}></TextField>
                 {/** <a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}> **/}
                 <Button startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
-                  ic_st_setIsKMCompleteDialogShown(false);
+                  //prevent processing if telp number is empty.
+                  if(ic_st_waNumberFix.length === 0){
+                    h_sf_showSnackbar('Nomor Telpon harus diisi','error');
+                    return;
+                  }
                   //download the image first, in case we will need it later
 
                   const downloadImage = async () => {
@@ -750,8 +754,10 @@ function App() {
                   const finishProcess = async () => {
                     try {
                       await downloadImage();
+                      ic_st_setIsKMCompleteDialogShown(false); //close dialog
                     } catch (err) {
                       h_sf_showSnackbar(err.message, 'error');
+                      ic_st_setIsKMCompleteDialogShown(false);//close dialog
                     }
                   }
 
