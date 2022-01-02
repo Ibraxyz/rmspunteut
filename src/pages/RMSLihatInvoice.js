@@ -348,9 +348,17 @@ const RMSLihatInvoice = () => {
                         await ic_af_deleteSelectedBills(ic_st_currentSelectedIDs);
                         for (let i = 0; i < ic_st_currentSelectedIDs.length; i++) {
                             //substract ikk report
-                            await substractIkkReport(ic_st_currentSelectedRowData[i]['status-tagihan'] === 'LUNAS' ? true : false, ic_st_currentSelectedRowData[i]['blok'], ic_st_currentSelectedRowData[i]['tahun'])
+                            await substractIkkReport(ic_st_currentSelectedRowData[i]['status-invoice'] === 'LUNAS' ? true : false, ic_st_currentSelectedRowData[i]['blok'], ic_st_currentSelectedRowData[i]['tahun'])
                             //substract all other report
-                            
+                            //status, blok, norumah, tahun, bulan, kolektorId, kategori
+                            const statusInvoice = ic_st_currentSelectedRowData[i]['status-invoice'] === 'LUNAS' ? true : false;
+                            const blokINV = ic_st_currentSelectedRowData[i]['blok'];
+                            const tahunINV = ic_st_currentSelectedRowData[i]['tahun'];
+                            const bulanINV = ic_st_currentSelectedRowData[i]['bulan'];
+                            const kolektorINV = ic_st_currentSelectedRowData[i]['kolektor']['uid']; //may cause bug
+                            const kategoriINV = ic_st_currentSelectedRowData[i]['kategori'];
+                            const biayaINV = ic_st_currentSelectedRowData[i]['biaya'];
+                            await substractReport(statusInvoice,blokINV,tahunINV,bulanINV,kolektorINV,kategoriINV,biayaINV);
                         }
                     } catch (err) {
                         console.log(err.message);

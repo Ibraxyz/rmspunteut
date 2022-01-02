@@ -102,14 +102,64 @@ const substractIkkReport = async (status, blok, tahun) => {
     }
 }
 
-const substractReport = async (status, blok, norumah, bulan, tahun) => {
+const substractReport = async (status, blok, tahun, bulan, kolektorId, kategori, biaya) => {
+    if (status === false) {
+        console.log('status is false so not proceed...');
+        return;
+    }
     //substract per blok report
-
+    const ref = collection(db, `per-blok-report/${tahun}/bulan/${bulan}/data/`);
+    const conditions = [
+        where('kolektor', '==', kolektorId),
+        where('blok', '==', blok),
+        where('kategori', "==", kategori)
+    ]
+    //get the report id first
+    const querySnapshot = await getDocs(query(ref, ...conditions));
+    const ids = [];
+    querySnapshot.forEach((doc) => {
+        ids.push(doc.id);
+    })
+    for (let i = 0; i < ids.length; i++) {
+        console.log(`deleting ${ids[i]}`);
+        await deleteDoc(doc(db, `per-blok-report/${ids[i]}`));
+        console.log(`${ids[i]} has been removed from per-blok-report`)
+    }
     //substract merged report
-
+    const mergedReport = await getDoc(doc(db, 'merged-report', `${tahun}`, "bulan", `${bulan}`, 'kolektor', `${kolektorId}`));
+    if (mergedReport.exists()) {
+        let total = mergedReport.data()['total'];
+        let newTotal = total - biaya;
+        await updateDoc(doc(db, 'merged-report', `${tahun}`, "bulan", `${bulan}`, 'kolektor', `${kolektorId}`), {
+            total: newTotal
+        });
+    } else {
+        console.log('no merged report found');
+    }
     //substract merged yearly report
-
+    const mergedYearlyReport = await getDoc(doc(db, 'merged-yearly-report', `${tahun}`, 'kolektor', `${kolektorId}`));
+    if (mergedYearlyReport.exists()) {
+        let total = mergedYearlyReport.data()['total'];
+        let newTotal = total - biaya;
+        ///merged-yearly-report/2022/kolektor/XE5ofDI9XbU3dV1xiOefIqNLGru1
+        await updateDoc(doc(db, 'merged-yearly-report', `${tahun}`, 'kolektor', `${kolektorId}`), {
+            total: newTotal
+        });
+    } else {
+        console.log('no merged yearly report found');
+    }
     //substract all time report
+    const allTimeReport = await getDoc(doc(db, `all-time-report/${kolektorId}`));
+    if (mergedYearlyReport.exists()) {
+        let total = allTimeReport.data()['total'];
+        let newTotal = total - biaya;
+        ///all-time-report/XE5ofDI9XbU3dV1xiOefIqNLGru1
+        await updateDoc(doc(db, 'all-time-report', `${kolektorId}`), {
+            total: newTotal
+        });
+    } else {
+        console.log('no all time report found');
+    }
 }
 
 //create ikk report 
@@ -182,7 +232,7 @@ const createIkkReport = async (tahun, bulan, blok, norumah, subtotal, biaya, cur
 }
 
 //get whatsapp link
-const getWhatsappLink = (yourNumber,yourMessage) => {
+const getWhatsappLink = (yourNumber, yourMessage) => {
     let number = '+62' + yourNumber.substring(1);
     let message = yourMessage.split(' ').join('%20')
     return 'https://api.whatsapp.com/send?phone=' + number + '&text=%20' + message;
