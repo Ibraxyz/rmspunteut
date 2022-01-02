@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ListSubheader from '@mui/material/ListSubheader';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import md5 from 'md5';
 
 const RMSGroupedSelect = (props) => {
     return (
@@ -14,7 +15,7 @@ const RMSGroupedSelect = (props) => {
                 {
                     props.an.map((a) => {
                         return (
-                            <MenuItem value={a.value}>{a.text}</MenuItem>
+                            <MenuItem key={md5(a.value+a.text)} value={a.value}>{a.text}</MenuItem>
                         )
                     })
                 }
@@ -22,7 +23,7 @@ const RMSGroupedSelect = (props) => {
                 {
                     props.aazz.map((a) => {
                         return (
-                            <MenuItem value={a.value}>{a.text}</MenuItem>
+                            <MenuItem key={md5(a.value+a.text)} value={a.value}>{a.text}</MenuItem>
                         )
                     })
                 }
@@ -30,7 +31,7 @@ const RMSGroupedSelect = (props) => {
                 {
                     props.tasbiII.map((a) => {
                         return (
-                            <MenuItem value={a.value}>{a.text}</MenuItem>
+                            <MenuItem key={md5(a.value+a.text)} value={a.value}>{a.text}</MenuItem>
                         )
                     })
                 }

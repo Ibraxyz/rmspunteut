@@ -14,7 +14,7 @@ import RMSGroupedSelect from '../components/RMSGroupedSelect';
 import useGroupedSelect from '../hooks/useGroupedSelect';
 
 const RMSReport = (props) => {
-    const [ic_st_an,ic_st_aazz,ic_st_tasbiII] = useGroupedSelect();
+    const [ic_st_an, ic_st_aazz, ic_st_tasbiII] = useGroupedSelect();
     const [ic_st_year, ic_st_setYear] = useState([]);
     const [h_st_isSnackbarShown, h_st_message, h_st_severity, h_sf_showSnackbar, h_sf_closeSnackbar] = useSnackbar();
     const [ic_st_blok, ic_st_setBlok] = useState([]);
@@ -78,9 +78,21 @@ const RMSReport = (props) => {
             const reportsArr = [];
             let index = 1;
             let totalIkk = 0;
-            let totalAll, totalJanuari, totalFebruari, totalMaret, totalApril, totalMei, totalJuni, totalJuli, totalAgustus, totalSeptember, totalOktober, totalNovember, totalDesember = 0;
+            let totalAll = 0;
+            let totalFebruari = 0
+            let totalMaret = 0
+            let totalApril = 0
+            let totalMei = 0
+            let totalJuni = 0
+            let totalJuli = 0
+            let totalAgustus = 0
+            let totalSeptember = 0
+            let totalOktober = 0
+            let totalNovember = 0
+            let totalDesember = 0;
+            let totalJanuari = 0;
             reports.forEach((report) => {
-                console.log(JSON.stringify(report.data()));
+                //console.log(JSON.stringify(report.data()));
                 totalIkk += report.data()['ikk'];
                 switch (report.data()['bulan']) {
                     case 1:
@@ -125,12 +137,8 @@ const RMSReport = (props) => {
                 reportsArr.push({ "id": report.id, "no": index, ...report.data() }); //map data to grid cell
                 index++;
             })
+            console.log('total januari inspect', totalJanuari);
             const reportTotalArr = [];
-            console.log(JSON.stringify({
-                "tjan": totalJanuari,
-                "tfeb": 0,
-                'tmar': 0
-            }))
             reportTotalArr.push({
                 "id": ic_st_blok + '' + ic_st_year,
                 "blok": ic_st_blok,
