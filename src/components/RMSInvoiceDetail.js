@@ -3,6 +3,9 @@ import { Divider, Stack, Box, Typography, Grid } from "@mui/material";
 //material ui
 import { Paper } from '@mui/material';
 import { formatRupiah } from '../rms-utility/rms-utility';
+//images
+//logo
+import Logo from '../images/logo.png';
 
 const top_defineMonthName = (month) => {
     let name = null;
@@ -67,6 +70,7 @@ const RMSInvoiceDetail = forwardRef((props, ref) => {
                 <Paper sx={{ display: props.isOpen ? 'default' : 'none', padding: '10px' }}>
                     <Grid container sx={{ paddingBottom: '10px' }} spacing={1}>
                         <Grid item xs={12} sm={6}>
+                            <img src={Logo} alt="" style={{ height: '64px', width: 'auto' }} />
                             <Typography variant="h6" display={'block'}>Detail Invoice</Typography>
                             <Typography variant="subtitle2" display={'block'} sx={{ opacity: 0.4 }}>#{props.currentRow[0]['id']}</Typography>
                         </Grid>
