@@ -156,7 +156,9 @@ const RMSReport = (props) => {
                 "november": totalNovember === undefined ? 0 : totalNovember,
                 "desember": totalDesember === undefined ? 0 : totalDesember,
             })
-            totalAll =
+            totalAll = totalJanuari + totalFebruari + totalMaret + totalApril + totalMei + totalJuni + totalAgustus + totalSeptember + totalOktober + totalNovember + totalDesember;
+            /** 
+             * totalAll =
                 + totalJanuari === undefined ? 0 : totalJanuari
                     + totalFebruari === undefined ? 0 : totalFebruari
                         + totalMaret === undefined ? 0 : totalMaret
@@ -169,6 +171,8 @@ const RMSReport = (props) => {
                                                     + totalOktober === undefined ? 0 : totalOktober
                                                         + totalNovember === undefined ? 0 : totalNovember
                                                             + totalDesember === undefined ? 0 : totalDesember
+            */
+            console.log('total all $ total jan',totalAll+' '+totalJanuari);
             ic_st_setTotalAll(totalAll);
             ic_st_setRows(reportsArr);
             ic_st_setTrows(reportTotalArr);
