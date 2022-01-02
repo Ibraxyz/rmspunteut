@@ -51,6 +51,7 @@ import RMSReport from './pages/RMSReport';
 import useBlok from './hooks/useBloks';
 import useGroupedSelect from './hooks/useGroupedSelect';
 import RMSInvoiceDetail from './components/RMSInvoiceDetail';
+import QRCode from 'react-qr-code';
 import { toDate } from 'date-fns';
 import md5 from 'md5';
 
@@ -112,20 +113,11 @@ function App() {
   const [ic_st_kmSelectedTahun, ic_st_kmSetSelectedTahun] = useState(null);
   //ops state
   const [ic_st_numberListOpsView, ic_st_setNumberListOpsView] = useState([]);
-  const [ic_st_isLoading, ic_st_setIsLoading] = useState(false);
   const [ic_st_nomList, ic_st_setNomList] = useState([]);
   const [ic_st_kmNomIsLoading, ic_st_setKmNomIsLoading] = useState(false);
   const [ic_st_isKMCompleteDialogShown, ic_st_setIsKMCompleteDialogShown] = useState(false);
   const [ic_st_kmCurrentPaidInv, ic_st_setKmCurrentPaidInv] = useState([]);
-  const [ic_st_waNumber, ic_st_setWaNumber] = useState('');
-  const [ic_st_waMessage, ic_st_setWaMessage] = useState('TEST MSG');
-  const [ic_st_kmWaLink, ic_st_setKmWaLink] = useState("");
-  useEffect(() => {
-    console.log(getWhatsappLink(ic_st_waNumber, ic_st_waMessage));
-    ic_st_setKmWaLink(
-      getWhatsappLink(ic_st_waNumber, ic_st_waMessage)
-    )
-  }, [ic_st_waNumber, ic_st_waMessage])
+  const [ic_st_waNumberFix,ic_st_setWaNUmberFIx] = useState(0);
   //snackbar
   const [h_st_isSnackbarShown, h_st_message, h_st_severity, h_sf_showSnackbar, h_sf_closeSnackbar] = useSnackbar();
   //firebase auth
@@ -636,6 +628,16 @@ function App() {
       h_sf_showSnackbar(err.message, 'error');
     }
   });
+  const ic_sf_constructQRData = () => {
+    let objString = JSON.stringify({
+      'id': ic_st_kmCurrentPaidInv[0]['id'],
+      'blok': ic_st_kmCurrentPaidInv[0]['blok'],
+      'nomor-rumah': ic_st_kmCurrentPaidInv[0]['nomor-rumah'],
+      'sisa': ic_st_kmCurrentPaidInv[0]['sisa'],
+      'status-invoice': true,
+    })
+    return objString;
+  }
   return (
     <>
       {
@@ -662,18 +664,21 @@ function App() {
                 handleBackButton={() => ic_st_setIsKMCompleteDialogShown(false)}
               >
                 {/** <QRCode size={64} value={ic_st_currentSelectedRowData.length > 0 ? ic_sf_constructQRData() : 'invalid'} /> */}
+                <QRCode size={64} value={ic_st_kmCurrentPaidInv.length > 0 ? ic_sf_constructQRData() : 'invalid'} />
               </RMSInvoiceDetail>
             </DialogContent>
             <Divider />
             <DialogActions>
               <Stack direction={'column'}>
-                <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e) => { ic_st_setWaNumber(e.target.value) }}></TextField>
+                <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e)=>ic_st_setWaNUmberFIx(e.target.value)}></TextField>
                 {/** <a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}> **/}
                 <Button startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
                   ic_st_setIsKMCompleteDialogShown(false);
                   //download the image first, in case we will need it later
 
                   const downloadImage = async () => {
+                    //set the loading to true
+                    ic_st_setKmNomIsLoading(true);
                     const element = invoiceImgRef.current;
                     const canvas = await html2canvas(element);
                     console.log('IMG CANVAS INSPECT', canvas);
@@ -692,8 +697,6 @@ function App() {
                       //Get the download URL
                       getDownloadURL(storageRef)
                         .then((url) => {
-                          //save the url in to the state
-                          ic_st_setWaMessage(url);
                           //click the link to download programmatically
                           const link = document.createElement('a');
                           if (typeof link.download === 'string') {
@@ -705,6 +708,15 @@ function App() {
                           } else {
                             window.open(data);
                           }
+                          //send to whatsapp
+                          const linkWA = document.createElement('a');
+                          const waLink = getWhatsappLink(ic_st_waNumberFix,url)
+                          linkWA.href = waLink;
+                          document.body.appendChild(linkWA);
+                          linkWA.click();
+                          document.body.removeChild(linkWA);
+                          ic_st_setWaNUmberFIx(0);
+                          ic_st_setKmNomIsLoading(false);
                         })
                         .catch((error) => {
                           // A full list of error codes is available at
@@ -727,25 +739,17 @@ function App() {
                               break;
                           }
                           h_sf_showSnackbar(error.code, 'error');
+                          ic_st_setKmNomIsLoading(false);
                         })
                     } catch (err) {
                       h_sf_showSnackbar(err.message, 'error');
                       console.log(err.message);
+                      ic_st_setKmNomIsLoading(false);
                     }
                   };
-
-                  const sendToWa = () => {
-                    const link = document.createElement('a');
-                    link.href = ic_st_kmWaLink;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }
-
                   const finishProcess = async () => {
                     try {
                       await downloadImage();
-                      sendToWa();
                     } catch (err) {
                       h_sf_showSnackbar(err.message, 'error');
                     }
