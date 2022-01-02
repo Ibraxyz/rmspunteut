@@ -1,5 +1,5 @@
 import './App.css';
-import { getStorage, ref, uploadString } from "firebase/storage";
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import React, { useEffect, useState, useRef } from "react";
 import PrimarySearchAppBar from "./components/PrimarySearchAppBar";
 import LihatTagihan from './pages/LihatTagihan';
@@ -67,7 +67,6 @@ export const dark = {
 
 function App() {
   const storage = getStorage();
-  const storageRef = ref(storage, 'invoices');
   //ref to generated invoice image
   const invoiceImgRef = useRef();
   //use block hook
@@ -266,12 +265,10 @@ function App() {
                             if (k === 'tagihan') {
                               inv[k] = JSON.stringify(inv['tagihan'])
                             }
-                            if (k === 'kolektor') {
-                              inv[k] = inv['kolektor'] === '-' ? '-' : JSON.stringify(inv['kolektor'])
-                            }
                           })
                           inv["sudah-dibayar"] = parseInt(inv['biaya']);
                           inv["sisa"] = 0;
+                          inv['kolektor'] = r_currentUser.name;
                           ic_st_setKmCurrentPaidInv([inv]);
                         }
                         updateInv();
@@ -289,12 +286,12 @@ function App() {
                       </Box>
                       <Divider />
                       <Box sx={{ padding: '10px' }} textAlign={'center'}>
-                        <Typography variant={'caption'}>{inv.id}</Typography>
+                        <Typography variant={'caption'}>ID : {inv.id}</Typography>
                       </Box>
                       <Divider />
                       <Box sx={{ padding: '10px' }} textAlign={'center'}>
                         {
-                          inv['nama-daftar-tagihan'].map((n) => <Typography key={n + Date.now()} content={'div'} variant={'caption'}>{n}</Typography>)
+                          inv['nama-daftar-tagihan'] === null || inv['nama-daftar-tagihan'] === undefined ? 'no-data' : inv['nama-daftar-tagihan'].map((n) => <Typography key={n + Date.now()} content={'div'} variant={'caption'}>{n}</Typography>)
                         }
                       </Box>
                       <Divider />
@@ -683,25 +680,57 @@ function App() {
                     const data = canvas.toDataURL('image/jpg');
                     console.log('IMG DATA INSPECT', data);
                     //upload to firebase storage
+                    console.log('ic_st_kmCurrentPaidInv INSPECTO', JSON.stringify(ic_st_kmCurrentPaidInv));
+                    const id = ic_st_kmCurrentPaidInv[0]['id'];
                     try {
-                      uploadString(storageRef, data, 'data_url').then((snapshot) => {
+                      const storageRef = ref(storage, `invoices-${id}.png`);
+                      //upload data
+                      await uploadString(storageRef, data, 'data_url').then((snapshot) => {
                         console.log('data url snapshot', snapshot);
                         console.log('Uploaded a data_url string!');
                       });
+                      //Get the download URL
+                      getDownloadURL(storageRef)
+                        .then((url) => {
+                          //save the url in to the state
+                          ic_st_setWaMessage(url);
+                          //click the link to download programmatically
+                          const link = document.createElement('a');
+                          if (typeof link.download === 'string') {
+                            link.href = data;
+                            link.download = `invoices-${id}.jpg`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          } else {
+                            window.open(data);
+                          }
+                        })
+                        .catch((error) => {
+                          // A full list of error codes is available at
+                          // https://firebase.google.com/docs/storage/web/handle-errors
+                          switch (error.code) {
+                            case 'storage/object-not-found':
+                              // File doesn't exist
+                              break;
+                            case 'storage/unauthorized':
+                              // User doesn't have permission to access the object
+                              break;
+                            case 'storage/canceled':
+                              // User canceled the upload
+                              break;
+
+                            // ...
+
+                            case 'storage/unknown':
+                              // Unknown error occurred, inspect the server response
+                              break;
+                          }
+                          h_sf_showSnackbar(error.code, 'error');
+                        })
                     } catch (err) {
                       h_sf_showSnackbar(err.message, 'error');
                       console.log(err.message);
-                    }
-                    const link = document.createElement('a');
-
-                    if (typeof link.download === 'string') {
-                      link.href = data;
-                      link.download = 'image.jpg';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    } else {
-                      window.open(data);
                     }
                   };
 
@@ -711,14 +740,15 @@ function App() {
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    //determine link to firestore storage
-                    let linkToStorage = "";
-                    ic_st_setWaMessage(linkToStorage);
                   }
 
                   const finishProcess = async () => {
-                    await downloadImage();
-                    //sendToWa();
+                    try {
+                      await downloadImage();
+                      sendToWa();
+                    } catch (err) {
+                      h_sf_showSnackbar(err.message, 'error');
+                    }
                   }
 
                   finishProcess();
