@@ -71,7 +71,7 @@ const RMSInvoiceDetail = forwardRef((props, ref) => {
                     <Grid container sx={{ paddingBottom: '10px' }} spacing={1}>
                         <Grid item xs={12} sm={6}>
                             <img src={Logo} alt="" style={{ height: '64px', width: 'auto' }} />
-                            <Typography variant="h6" display={'block'}>Detail Invoice</Typography>
+                            <Typography variant="h6" display={'block'}>Invoice</Typography>
                             <Typography variant="subtitle2" display={'block'} sx={{ opacity: 0.4 }}>#{props.currentRow[0]['id']}</Typography>
                         </Grid>
                         <Grid item xs={12} sm={6} textAlign={{ xs: 'left', sm: 'right' }}>
