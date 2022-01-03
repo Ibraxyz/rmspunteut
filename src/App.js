@@ -657,6 +657,9 @@ function App() {
             <DialogTitle>Bukti Pembayaran</DialogTitle>
             <Divider />
             <DialogContent>
+              {
+                ic_st_kmNomIsLoading ? <LinearProgress /> : <></>
+              }
               <RMSInvoiceDetail
                 ref={invoiceImgRef}
                 isOpen={true}
