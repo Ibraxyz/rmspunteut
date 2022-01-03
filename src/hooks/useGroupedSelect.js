@@ -101,7 +101,6 @@ useGroupedSelect.js:17 blok data --- save now {"id":"VI","kategori":"TASBI_II","
 useGroupedSelect.js:17 blok data --- save now {"id":"VII","kategori":"TASBI_II","nama":"VII"}
 useGroupedSelect.js:17 blok data --- save now {"id":"VIII","kategori":"TASBI_II","nama":"VIII"}
 useGroupedSelect.js:17 blok data --- save now {"id":"VV","kategori":"TASBI_I_AA-ZZ","nama":"VV"}
-useGroupedSelect.js:17 blok data --- save now {"id":"WW","nama":"WW","kategori":"TASBI_I_AA-ZZ"}
 useGroupedSelect.js:17 blok data --- save now {"id":"X","kategori":"TASBI_II","nama":"X"}
 useGroupedSelect.js:17 blok data --- save now {"id":"XI","kategori":"TASBI_II","nama":"XI"}
 useGroupedSelect.js:17 blok data --- save now {"id":"XX","kategori":"TASBI_I_AA-ZZ","nama":"XX"}

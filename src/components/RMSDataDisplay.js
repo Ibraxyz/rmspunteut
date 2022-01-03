@@ -10,6 +10,7 @@ import DetailsIcon from '@mui/icons-material/Details';
 import HistoryIcon from '@mui/icons-material/History';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 const RMSDataDisplay = (props) => {
     const [ic_st_isMultipleSelectModeActive, ic_st_setIsMultipleSelectModeActive] = useState(false);
@@ -57,6 +58,7 @@ const RMSDataDisplay = (props) => {
                             <Button sx={{ margin: "5px", display: "default" }} startIcon={<DetailsIcon />} onClick={props.openInvoice} variant="outlined" disabled={props.currentSelectedIDs.length === 0 || props.currentSelectedIDs.length > 1 ? true : false}>{props.isDetailShown ? 'Tutup Detail' : 'Lihat Detail'}</Button>
                             <Button sx={{ margin: "5px", display: "default" }} startIcon={<ReceiptIcon />} onClick={props.openPrintInvoice} variant="outlined" disabled={props.currentSelectedIDs.length === 0 || props.currentSelectedIDs.length > 1 ? true : false}>Cetak Invoice</Button>
                             <Button sx={{ margin: "5px", display: "default" }} startIcon={<LocalOfferIcon />} onClick={props.openDiscountDialog} variant="outlined" disabled={ic_sf_inspectIDsStatus(props.currentSelectedIDs[0]) ? true : props.currentSelectedIDs.length === 0 || props.currentSelectedIDs.length > 1 ? true : false}>Beri Diskon</Button>
+                            <Button startIcon={<AssessmentIcon/>} sx={{margin:'5px'}} onClick={props.handleCreateReport} variant={'contained'}>Buat Laporan</Button>
                         </Box>
                     </Paper>
             }

@@ -17,7 +17,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useReactToPrint } from 'react-to-print';
 //qr code
 import QRCode from "react-qr-code";
-import { defineMonthName, getSeparatedDate, substractIkkReport, substractReport } from "../rms-utility/rms-utility";
+import { defineMonthName, getSeparatedDate, substractIkkReport, substractReport, createReportFromInvoices } from "../rms-utility/rms-utility";
 //react router dom
 import { useParams } from 'react-router-dom';
 //rms
@@ -28,6 +28,8 @@ import { setDoc, doc } from 'firebase/firestore';
 import { useSelector } from "react-redux";
 //utility
 import useBloks from "../hooks/useBloks";
+import RMSFullScreenDialog from "../components/RMSFullScreenDialog";
+import RMSDisplayTable from "../components/RMSDisplayTable";
 
 //inner component
 const TopPrintPreview = (props) => {
@@ -54,6 +56,8 @@ const TopPrintPreview = (props) => {
 const RMSLihatInvoice = () => {
     //--------------------------------------------------------------------------------------------------//
     //redux state => current logged in user
+    //full screen dialog state
+    const [ic_st_isFullScreenDialogOpen, ic_st_setIsFullScreenDialogOpen] = useState(false);
     const r_currentUser = useSelector((state) => state.currentUser);
     const [ic_st_blokItems] = useBloks();
     //params
@@ -358,7 +362,7 @@ const RMSLihatInvoice = () => {
                             const kolektorINV = ic_st_currentSelectedRowData[i]['kolektor']['uid']; //may cause bug
                             const kategoriINV = ic_st_currentSelectedRowData[i]['kategori'];
                             const biayaINV = ic_st_currentSelectedRowData[i]['biaya'];
-                            await substractReport(statusInvoice,blokINV,tahunINV,bulanINV,kolektorINV,kategoriINV,biayaINV);
+                            await substractReport(statusInvoice, blokINV, tahunINV, bulanINV, kolektorINV, kategoriINV, biayaINV);
                         }
                     } catch (err) {
                         console.log(err.message);
@@ -371,6 +375,13 @@ const RMSLihatInvoice = () => {
                 openInvoice={() => ic_st_setIsInvoiceDetailOpen(!ic_st_isInvoiceDetailOpen)}
                 openPrintInvoice={() => { ic_st_setIsPrintPreviewShown(true) }}
                 openDiscountDialog={() => { ic_st_setIsDiscountDialogOpen(true); ic_st_setProposedPrice(ic_st_currentSelectedRowData[0]['biaya']) }}
+                handleCreateReport={() => {
+                    //alert("ok");
+                    //show report window
+                    ic_st_setIsFullScreenDialogOpen(true);
+                    //create report from invoices row
+                    createReportFromInvoices(ic_st_rows);
+                }}
             >
                 <RMSInvoiceDetail
                     isOpen={ic_st_isInvoiceDetailOpen}
@@ -399,6 +410,17 @@ const RMSLihatInvoice = () => {
                     <QRCode size={64} value={ic_st_currentSelectedRowData.length > 0 ? ic_sf_constructQRData() : 'invalid'} />
                 </RMSInvoiceDetail>
             </TopPrintPreview>
+            {/** report from invoice dialog */}
+            <RMSFullScreenDialog
+                isOpen={ic_st_isFullScreenDialogOpen}
+                handleClose={() => ic_st_setIsFullScreenDialogOpen(false)}
+            >
+                {/** table */}
+                <RMSDisplayTable
+                    tableHead={['blok', 'nomor-rumah', 'bulan', 'tahun', 'status-invoice', 'biaya']}
+                    rows={ic_st_rows}
+                />
+            </RMSFullScreenDialog>
             {/** special price dialog */}
             {
                 ic_st_isDiscountDialogOpen ?
