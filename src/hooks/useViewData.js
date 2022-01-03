@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { toDate } from 'date-fns';
 //firebase
 import { db } from "../index";
-import { collection, getDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDoc, getDocs, query, where, doc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
 
 const useViewData = (arg_setFilterOptionsList, arg_st_setFilterOptionsList, targetCollection) => {
     //functions
@@ -128,7 +128,7 @@ const useViewData = (arg_setFilterOptionsList, arg_st_setFilterOptionsList, targ
     //build multiple condition, later these multiple wheres will be used as an argument when querying
     const ic_sf_constructFirebaseWheres = (data) => {
         return data.map((op) => {
-            console.log('value : '+op['value']+'|'+'propertyValue : '+op['propertyValue'])
+            console.log('value : ' + op['value'] + '|' + 'propertyValue : ' + op['propertyValue'])
             //return where((op['value'] === 'tanggal-awal' || op['value'] === 'tanggal-akhir' ? 'tanggal-aktif' : op['value']), (op['value'] === 'tanggal-awal' ? '>=' : op['value'] === 'tanggal-akhir' ? '<=' : '=='), op['propertyValue']);
             return where(op['value'], '==', op['propertyValue']);
         });
@@ -143,7 +143,7 @@ const useViewData = (arg_setFilterOptionsList, arg_st_setFilterOptionsList, targ
                 dataObj.push({
                     "id": doc.id,
                     ...doc.data()
-                })
+                });
             });
             return dataObj;
         } catch (err) {
@@ -258,11 +258,11 @@ const useViewData = (arg_setFilterOptionsList, arg_st_setFilterOptionsList, targ
         ic_st_tagihanData.length > 0 ? ic_st_setRows(ic_st_tagihanData.map((dt) => {
             return {
                 "id": dt["id"],
-                "kategori" : dt['kategori'],
+                "kategori": dt['kategori'],
                 "status-invoice": dt['status-invoice'] == true ? 'LUNAS' : 'BELUM LUNAS', //ok
                 "nama-daftar-tagihan": JSON.stringify(dt['nama-daftar-tagihan']), //ok
-                "subtotal" : dt['subtotal'],
-                "potongan" : dt['potongan'],
+                "subtotal": dt['subtotal'],
+                "potongan": dt['potongan'],
                 "biaya": dt['biaya'], //not available
                 "banyak-biaya": dt['banyak-biaya'],
                 "sudah-dibayar": dt['sudah-dibayar'], //not available
