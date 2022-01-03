@@ -721,6 +721,7 @@ function App() {
                           document.body.removeChild(linkWA);
                           ic_st_setWaNUmberFIx(0);
                           ic_st_setKmNomIsLoading(false);
+                          ic_st_setIsKMCompleteDialogShown(false); //close dialog
                         })
                         .catch((error) => {
                           // A full list of error codes is available at
@@ -744,6 +745,7 @@ function App() {
                           }
                           h_sf_showSnackbar(error.code, 'error');
                           ic_st_setKmNomIsLoading(false);
+                          ic_st_setIsKMCompleteDialogShown(false); //close dialog
                         })
                     } catch (err) {
                       h_sf_showSnackbar(err.message, 'error');
@@ -754,7 +756,6 @@ function App() {
                   const finishProcess = async () => {
                     try {
                       await downloadImage();
-                      ic_st_setIsKMCompleteDialogShown(false); //close dialog
                     } catch (err) {
                       h_sf_showSnackbar(err.message, 'error');
                       ic_st_setIsKMCompleteDialogShown(false);//close dialog
