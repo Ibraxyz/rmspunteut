@@ -675,7 +675,7 @@ function App() {
               <Stack direction={'column'}>
                 <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e)=>ic_st_setWaNUmberFIx(e.target.value)}></TextField>
                 {/** <a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}> **/}
-                <Button startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
+                <Button disabled={ic_st_kmNomIsLoading ? true : false} startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
                   //prevent processing if telp number is empty.
                   if(ic_st_waNumberFix.length === 0){
                     h_sf_showSnackbar('Nomor Telpon harus diisi','error');
