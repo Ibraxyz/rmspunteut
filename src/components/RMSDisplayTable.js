@@ -18,24 +18,43 @@ export default function RMSDisplayTable(props) {
     const [groupedArray, setGroupedArray] = useState([]);
     useEffect(() => {
         //group report based on blok
+        const groupedObject = {};
+        const groupedObjectArr = [];
+        props.rows.forEach((row) => {
+            if (groupedObject[row['blok']] === undefined) {
+                groupedObject[row['blok']] = [row];
+            } else {
+                groupedObject[row['blok']] = [...groupedObject[row['blok']], row];
+            }
+        });
+        const keys = Object.keys(groupedObject);
+        for (let i = 0; i < keys.length; i++) {
+            console.log('key', keys[i]);
+            if (groupedObject[keys[i]].length > 0) {
+                for (let j = 0; j < groupedObject[keys[i]].length; j++) {
+                    groupedObjectArr.push(groupedObject[keys[i]][j]);
+                }
+            }
+        }
+        setGroupedArray(groupedObjectArr);
         //......
         let newTotal = 0; //total yang sudah bayar
         let totalBelumLunas = 0;
         let totalRK = 0;
         let totalTMB = 0;
         let totalEMPTY = 0;
-        for (var i = 0; i < props.rows.length; i++) {
-            if (props.rows[i]['status-invoice'] === 'LUNAS' && props.rows[i]['biaya'] !== 'RK' && props.rows[i]['biaya'] !== 'TMB' && props.rows[i]['biaya'] !== 'EMPTY') {
-                newTotal += parseInt(props.rows[i].biaya);
-                console.log('newTotal value inspect',newTotal);
-            } else if (props.rows[i]['status-invoice'] === 'BELUM LUNAS' && props.rows[i]['biaya'] !== 'RK' && props.rows[i]['biaya'] !== 'TMB' && props.rows[i]['biaya'] !== 'EMPTY') {
-                totalBelumLunas += parseInt(props.rows[i].biaya);
-                console.log('totalBelumLunas value inspect',totalBelumLunas);
-            } else if (props.rows[i]['biaya'] === 'RK') {
+        for (var i = 0; i < groupedObjectArr.length; i++) {
+            if (groupedObjectArr[i]['status-invoice'] === 'LUNAS' && groupedObjectArr[i]['biaya'] !== 'RK' && groupedObjectArr[i]['biaya'] !== 'TMB' && groupedObjectArr[i]['biaya'] !== 'EMPTY') {
+                newTotal += parseInt(groupedObjectArr[i].biaya);
+                console.log('newTotal value inspect', newTotal);
+            } else if (groupedObjectArr[i]['status-invoice'] === 'BELUM LUNAS' && groupedObjectArr[i]['biaya'] !== 'RK' && groupedObjectArr[i]['biaya'] !== 'TMB' && groupedObjectArr[i]['biaya'] !== 'EMPTY') {
+                totalBelumLunas += parseInt(groupedObjectArr[i].biaya);
+                console.log('totalBelumLunas value inspect', totalBelumLunas);
+            } else if (groupedObjectArr[i]['biaya'] === 'RK') {
                 totalRK++;
-            } else if (props.rows[i]['biaya'] === 'TMB') {
+            } else if (groupedObjectArr[i]['biaya'] === 'TMB') {
                 totalTMB++;
-            } else if (props.rows[i]['biaya'] === 'EMPTY') {
+            } else if (groupedObjectArr[i]['biaya'] === 'EMPTY') {
                 totalEMPTY++;
             }
         }
@@ -61,7 +80,7 @@ export default function RMSDisplayTable(props) {
                 </TableHead>
                 <TableBody>
                     {
-                        props.rows.map((row, index) => {
+                        groupedArray.map((row, index) => {
                             return (
                                 <TableRow
                                     key={index + 1}
@@ -90,7 +109,7 @@ export default function RMSDisplayTable(props) {
                                                 displayedAs = row[th];
                                             }
                                             return (
-                                                <TableCell key={`tc-${th}-${index}`} align="left">{displayedAs}</TableCell>
+                                                <TableCell key={`tc-${th}-${index}`} align="left" sx={{ color: row['biaya'] === 'RK' || row['biaya'] === 'TMB' || row['biaya'] === 'EMPTY' ? 'red' : 'black' }}>{displayedAs}</TableCell>
                                             )
                                         })
                                     }
