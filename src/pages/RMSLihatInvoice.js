@@ -60,7 +60,7 @@ const RMSLihatInvoice = () => {
     const [ic_st_isFullScreenDialogOpen, ic_st_setIsFullScreenDialogOpen] = useState(false);
     const r_currentUser = useSelector((state) => state.currentUser);
     const [ic_st_blokItems] = useBloks();
-    const [ic_st_isLoadingIn,ic_st_setIsLoadingIn] = useState(false);
+    const [ic_st_isLoadingIn, ic_st_setIsLoadingIn] = useState(false);
     //params
     const { id } = useParams();
     //effect - params
@@ -377,13 +377,10 @@ const RMSLihatInvoice = () => {
                 openPrintInvoice={() => { ic_st_setIsPrintPreviewShown(true) }}
                 openDiscountDialog={() => { ic_st_setIsDiscountDialogOpen(true); ic_st_setProposedPrice(ic_st_currentSelectedRowData[0]['biaya']) }}
                 handleCreateReport={() => {
-                    //alert("ok");
-                    //show report window
+                    ic_st_setIsLoadingIn(true);
                     ic_st_setIsFullScreenDialogOpen(true);
-                    //create report from invoices row
-                    createReportFromInvoices(ic_st_rows);
                 }}
-                isCreateReportButtonActive={!ic_st_setIsLoadingIn}
+                isProcessingData={ic_st_isLoadingIn}
             >
                 <RMSInvoiceDetail
                     isOpen={ic_st_isInvoiceDetailOpen}
@@ -419,9 +416,10 @@ const RMSLihatInvoice = () => {
             >
                 {/** table */}
                 <RMSDisplayTable
-                    tableHead={['nama-daftar-tagihan','blok', 'nomor-rumah', 'bulan', 'tahun', 'status-invoice', 'biaya']}
+                    startProcess={() => ic_st_setIsLoadingIn(true)}
+                    tableHead={['nama-daftar-tagihan', 'blok', 'nomor-rumah', 'bulan', 'tahun', 'status-invoice', 'biaya']}
                     rows={ic_st_rows}
-                    finishProcess={()=>ic_st_setIsLoadingIn(false)}
+                    finishProcess={() => ic_st_setIsLoadingIn(false)}
                 />
             </RMSFullScreenDialog>
             {/** special price dialog */}

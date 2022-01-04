@@ -332,10 +332,6 @@ const createReport = async (blok, category, nominal, currentUser) => {
     }
 }
 
-//create report from invoice
-const createReportFromInvoices = (rows) => {
-
-}
 export {
     asyncForEach,
     formatRupiah,
@@ -346,5 +342,4 @@ export {
     substractIkkReport,
     substractReport,
     getWhatsappLink,
-    createReportFromInvoices
 };

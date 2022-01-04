@@ -12,7 +12,7 @@ const useDataEditLogic = (jenisLogic, selectedCollection, mapDataToRowFunc) => {
         setCurrentSelectedIds(g);
     }
     const editRowsModelChangeAction = (e) => { //used for get docId,field,value from data grid in order to upload data to db
-        console.log('onEditRowsModelChange e', e);
+        console.log('onEditRowsModelChange e', JSON.stringify(e));
         for (var d in e) {
             setEditDataDocIdTracker(d);
             for (var f in e[d]) {
@@ -87,7 +87,7 @@ const useDataEditLogic = (jenisLogic, selectedCollection, mapDataToRowFunc) => {
                     await d_editData(selectedCollection, editDataDocIdTracker, { tanggal_dibayar: editDataValueTracker });
                 } else if (editDataFieldTracker === 'status_kelompok_tagihan') {
                     await d_editData(selectedCollection, editDataDocIdTracker, { status_kelompok_tagihan: editDataValueTracker == "LUNAS" || editDataValueTracker == "lunas" || editDataValueTracker == "Lunas" ? true : false });
-                }else {
+                } else {
                     console.log('error when updating data..');
                     return;
                 }
@@ -131,8 +131,8 @@ const useDataEditLogic = (jenisLogic, selectedCollection, mapDataToRowFunc) => {
         console.log("DATA EDIT LOGIC USEEFFECT [] GETDATA B_D")
         const getDataProcess = async () => {
             try {
-                if(selectedCollection == 'biaya'){
-                    await d_getData([]); 
+                if (selectedCollection == 'biaya') {
+                    await d_getData([]);
                 }
                 await b_getData([]);
             } catch (err) {
@@ -156,7 +156,7 @@ const useDataEditLogic = (jenisLogic, selectedCollection, mapDataToRowFunc) => {
     }, [b_data]);
     useEffect(() => {
         //this is used for populate table for the first time if selected collection is biaya
-        if(selectedCollection == 'biaya'){
+        if (selectedCollection == 'biaya') {
             mapDataToRowFunc();
         }
     }, [d_data])

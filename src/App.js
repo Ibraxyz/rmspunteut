@@ -54,6 +54,7 @@ import RMSInvoiceDetail from './components/RMSInvoiceDetail';
 import QRCode from 'react-qr-code';
 import { toDate } from 'date-fns';
 import md5 from 'md5';
+import RMSLihatKK from './pages/RMSLihatKK';
 
 export const light = {
   palette: {
@@ -117,7 +118,7 @@ function App() {
   const [ic_st_kmNomIsLoading, ic_st_setKmNomIsLoading] = useState(false);
   const [ic_st_isKMCompleteDialogShown, ic_st_setIsKMCompleteDialogShown] = useState(false);
   const [ic_st_kmCurrentPaidInv, ic_st_setKmCurrentPaidInv] = useState([]);
-  const [ic_st_waNumberFix,ic_st_setWaNUmberFIx] = useState(0);
+  const [ic_st_waNumberFix, ic_st_setWaNUmberFIx] = useState(0);
   //snackbar
   const [h_st_isSnackbarShown, h_st_message, h_st_severity, h_sf_showSnackbar, h_sf_closeSnackbar] = useSnackbar();
   //firebase auth
@@ -385,7 +386,7 @@ function App() {
                   <InputKK />
                 </Route>
                 <Route path="/lihat-kk">
-                  <LihatKK />
+                  <RMSLihatKK />
                 </Route>
                 <Route path="/cetak-kuitansi">
                   <CetakKuitansi />
@@ -673,12 +674,12 @@ function App() {
             <Divider />
             <DialogActions>
               <Stack direction={'column'}>
-                <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e)=>ic_st_setWaNUmberFIx(e.target.value)}></TextField>
+                <TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e) => ic_st_setWaNUmberFIx(e.target.value)}></TextField>
                 {/** <a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}> **/}
                 <Button disabled={ic_st_kmNomIsLoading ? true : false} startIcon={<WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
                   //prevent processing if telp number is empty.
-                  if(ic_st_waNumberFix.length === 0){
-                    h_sf_showSnackbar('Nomor Telpon harus diisi','error');
+                  if (ic_st_waNumberFix.length === 0) {
+                    h_sf_showSnackbar('Nomor Telpon harus diisi', 'error');
                     return;
                   }
                   //download the image first, in case we will need it later
@@ -717,7 +718,7 @@ function App() {
                           }
                           //send to whatsapp
                           const linkWA = document.createElement('a');
-                          const waLink = getWhatsappLink(ic_st_waNumberFix,url)
+                          const waLink = getWhatsappLink(ic_st_waNumberFix, url)
                           linkWA.href = waLink;
                           document.body.appendChild(linkWA);
                           linkWA.click();

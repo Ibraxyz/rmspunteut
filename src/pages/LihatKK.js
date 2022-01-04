@@ -14,13 +14,35 @@ import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { getTime } from 'date-fns';
 import useBlok from "../hooks/useBloks";
-import { setDoc } from "firebase/firestore";
+import { setDoc, updateDoc } from "firebase/firestore";
 import { db } from '../index';
 import { doc, collection, getDocs } from 'firebase/firestore';
 import RMSGroupedSelect from '../components/RMSGroupedSelect';
 import useGroupedSelect from '../hooks/useGroupedSelect';
 const LihatKK = (props) => {
     //const [ic_st_blokItems] = useBlok();
+    //functions
+    /** kk object
+     * biaya-bulanan
+        "100000"
+        blok
+        "QQ"
+        no_rumah
+        "32"
+     */
+    const [biayaBulananData, setBiayaBulananData] = useState("");
+    const [blokData, setBlokData] = useState("");
+    const [no_rumahData, setNo_rumahData] = useState("");
+    const editKK = async () => {
+        if (currentSelectedIds.length === 0 || currentSelectedIds === null || currentSelectedIds === undefined) {
+            return;
+        }
+        await updateDoc(doc(db, `kk/${currentSelectedIds}`), {
+            "biaya-bulanan": biayaBulananData,
+            "blok": blokData,
+            "no_rumah": no_rumahData
+        })
+    };
     const [
         blocks,
         setBlok,
@@ -189,7 +211,21 @@ const LihatKK = (props) => {
             default:
         }
     }
-    const [ic_st_an,ic_st_aazz,ic_st_tasbiII] = useGroupedSelect();
+    const [ic_st_an, ic_st_aazz, ic_st_tasbiII] = useGroupedSelect();
+    useEffect(() => {
+        console.log('setEditDataValueTracker root inspect', editDataValueTracker);
+    }, [editDataValueTracker])
+    const [editedObj, setEditedObj] = useState({});
+    const internalHandleModelChange = (e) => {
+        console.log(JSON.stringify(e)); //e is row id
+        //determine field
+        let field = null;
+        let value = null;
+        Object.keys(e).forEach((o)=>{
+            field = o;
+            value = e[o]['value'];
+        })
+    }
     return (
         <div>
             <Box style={{ marginBottom: "20px" }}>
@@ -303,7 +339,7 @@ const LihatKK = (props) => {
                     <Box sx={{ marginBottom: "100px" }}>
                         <Paper>
                             <Box sx={{ padding: "10px", height: 400 }}>
-                                <MITDataGrid rows={rows} columns={d_columns} isCellEditable={isCellInEditMode} selectionModelChangeAction={(g) => selectionModelChangeAction(g)} editRowsModelChangeAction={(e) => editRowsModelChangeAction(e)} />
+                                <MITDataGrid rows={rows} columns={d_columns} isCellEditable={isCellInEditMode} selectionModelChangeAction={(g) => selectionModelChangeAction(g)} editRowsModelChangeAction={(e) => internalHandleModelChange(e)} />
                             </Box>
                             <Divider />
                             <Box sx={{ padding: "10px" }}>
@@ -316,7 +352,7 @@ const LihatKK = (props) => {
                                 }} variant="outlined" disabled={currentSelectedIds.length === 0 ? true : false}>Hapus KK yang dipilih</Button>
                                 <Button sx={{ margin: "5px", display: isCellInEditMode ? "default" : "none" }} startIcon={<CancelIcon />} onClick={() => cancelEdit()} variant="contained" disabled={false}>Batal</Button>
                                 <Button sx={{ margin: "5px", display: isCellInEditMode ? "none" : "default" }} startIcon={<EditIcon />} onClick={() => setIsCellInEditMode(true)} variant="outlined" disabled={false}>Edit Data</Button>
-                                <Button sx={{ margin: "5px", display: isCellInEditMode ? "default" : "none" }} startIcon={<SaveIcon />} onClick={editData} variant="outlined" disabled={isSaveButtonOn}>Simpan Perubahan</Button>
+                                <Button sx={{ margin: "5px", display: isCellInEditMode ? "default" : "none" }} startIcon={<SaveIcon />} onClick={() => editKK()} variant="outlined" disabled={isSaveButtonOn}>Simpan Perubahan</Button>
                             </Box>
                         </Paper>
                     </Box>

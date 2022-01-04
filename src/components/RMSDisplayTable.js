@@ -17,6 +17,7 @@ export default function RMSDisplayTable(props) {
     const [totalEMPTY, setTotalEMPTY] = useState(0);
     const [groupedArray, setGroupedArray] = useState([]);
     useEffect(() => {
+        props.startProcess();
         //group report based on blok
         const groupedObject = {};
         const groupedObjectArr = [];
@@ -48,6 +49,7 @@ export default function RMSDisplayTable(props) {
                 newTotal += parseInt(groupedObjectArr[i].biaya);
                 console.log('newTotal value inspect', newTotal);
             } else if (groupedObjectArr[i]['status-invoice'] === 'BELUM LUNAS' && groupedObjectArr[i]['biaya'] !== 'RK' && groupedObjectArr[i]['biaya'] !== 'TMB' && groupedObjectArr[i]['biaya'] !== 'EMPTY') {
+                console.log(`biaya inspect what make its NaN ${groupedObjectArr[i]['blok']}|${groupedObjectArr[i]['nomor-rumah']}`, groupedObjectArr[i].biaya);
                 totalBelumLunas += parseInt(groupedObjectArr[i].biaya);
                 console.log('totalBelumLunas value inspect', totalBelumLunas);
             } else if (groupedObjectArr[i]['biaya'] === 'RK') {
