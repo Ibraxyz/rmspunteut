@@ -2167,8 +2167,8 @@ let homeObj = [
     },
     {
         "blok": "MM",
-        "no": "01",
-        "ikk": "A"
+        "no": "01A",
+        "ikk": "100000"
     },
     {
         "blok": "MM",
@@ -4747,8 +4747,8 @@ let homeObj = [
     },
     {
         "blok": "SS",
-        "no": "84",
-        "ikk": "A"
+        "no": "84A",
+        "ikk": "150000"
     },
     {
         "blok": "SS",
@@ -6952,8 +6952,8 @@ let homeObj = [
     },
     {
         "blok": "YY",
-        "no": "92",
-        "ikk": "A"
+        "no": "92A",
+        "ikk": "150000"
     },
     {
         "blok": "YY",
@@ -6982,13 +6982,13 @@ let homeObj = [
     },
     {
         "blok": "YY",
-        "no": "98",
-        "ikk": "A"
+        "no": "98A",
+        "ikk": "TMB"
     },
     {
         "blok": "YY",
-        "no": "98",
-        "ikk": "B"
+        "no": "98B",
+        "ikk": "RK"
     },
     {
         "blok": "YY",
@@ -9676,13 +9676,11 @@ let homeObj = [
     },
     {
         "blok": "DD",
-        "no": "09",
-        "ikk": "A"
+        "no": "09A"
     },
     {
         "blok": "DD",
-        "no": "12",
-        "ikk": "A"
+        "no": "12A"
     },
     {
         "blok": "DD",
@@ -10506,13 +10504,13 @@ let homeObj = [
     },
     {
         "blok": "F",
-        "no": "34",
-        "ikk": "A"
+        "no": "34A",
+        "ikk": "150000"
     },
     {
         "blok": "F",
-        "no": "34",
-        "ikk": "B"
+        "no": "34B",
+        "ikk": "RK"
     },
     {
         "blok": "F",
@@ -10541,13 +10539,13 @@ let homeObj = [
     },
     {
         "blok": "F",
-        "no": "40",
-        "ikk": "A"
+        "no": "40A",
+        "ikk": "EMPTY"
     },
     {
         "blok": "F",
-        "no": "40",
-        "ikk": "B"
+        "no": "40B",
+        "ikk": "RK"
     },
     {
         "blok": "F",
@@ -10651,13 +10649,13 @@ let homeObj = [
     },
     {
         "blok": "F",
-        "no": "64",
-        "ikk": "A"
+        "no": "64A",
+        "ikk": "EMPTY"
     },
     {
         "blok": "F",
-        "no": "64",
-        "ikk": "B"
+        "no": "64B",
+        "ikk": "200000"
     },
     {
         "blok": "F",
@@ -13144,8 +13142,8 @@ let homeObj = [
     },
     {
         "blok": "2",
-        "no": "96",
-        "ikk": "A"
+        "no": "96A",
+        "ikk": "RK"
     },
     {
         "blok": "2",
@@ -13154,8 +13152,8 @@ let homeObj = [
     },
     {
         "blok": "2",
-        "no": "97",
-        "ikk": "A"
+        "no": "97A",
+        "ikk": "100000"
     },
     {
         "blok": "2",
