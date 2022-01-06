@@ -29,7 +29,7 @@ const RMSLihatKK = (props) => {
                 const ref = collection(db, 'kk');
                 const conditions = [
                     where('blok', '==', ic_st_blok),
-                ];
+                ]; 
                 const bloks = await getDocs(query(ref, ...conditions));
                 const arr = [];
                 bloks.forEach((doc) => {
@@ -43,13 +43,17 @@ const RMSLihatKK = (props) => {
                             //alert(`edit ${ar.id}`)
                             //ic_st_setEditedObj(ar)
                             ic_st_setCurrentStagedId(ar.id);
+                            ic_st_setEditedObj({
+                                "no_rumah": ar['no_rumah'],
+                                "biaya-bulanan": ar['biaya-bulanan']
+                            })
                             ic_st_setIsEditOpen(true);
                         },
                         hapus: () => {
                             //ic_st_setCurrentStagedId(ar.id);
                             deleteData(ar.id);
                         }
-                    })
+                    });
                 })
                 ic_st_setRows(arrWithAction);
                 ic_st_setIsLoading(false);
@@ -74,7 +78,7 @@ const RMSLihatKK = (props) => {
     const updateData = async (id, obj) => {
         let isZeroLengthAvailable = false;
         Object.keys(obj).forEach((o) => {
-            if (obj[0] === "") {
+            if (obj[o] === "") {
                 isZeroLengthAvailable = true;
             }
         })
@@ -177,10 +181,9 @@ const RMSLihatKK = (props) => {
                     {/** batal */}
                     <Button variant={'contained'} onClick={() => ic_st_setIsEditOpen(false)}>Batal</Button>
                     {/** edit */}
-                    <Button variant={'outlined'} onClick={() => updateData(ic_st_currentStagedId, ic_st_editedObj)} >Update</Button>
+                    <Button variant={'outlined'} onClick={() => updateData(ic_st_currentStagedId, ic_st_editedObj)} disabled={ic_st_isLoading}>Update</Button>
                 </DialogActions>
             </Dialog>
-
         </Box>
     )
 }

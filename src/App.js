@@ -13,6 +13,7 @@ import LihatKK from "./pages/LihatKK";
 import InputKK from "./pages/InputKK";
 import InputBiaya from "./pages/InputBiaya";
 import RMSSignUp from './pages/RMSSignUp';
+import RMSCheckData from './pages/RMSCheckData';
 //redux
 import { useSelector, useDispatch } from "react-redux";
 import { bindActionCreators } from 'redux';
@@ -387,6 +388,7 @@ function App() {
                 </Route>
                 <Route path="/lihat-kk">
                   <RMSLihatKK />
+                  {/** <RMSCheckData /> **/}
                 </Route>
                 <Route path="/cetak-kuitansi">
                   <CetakKuitansi />

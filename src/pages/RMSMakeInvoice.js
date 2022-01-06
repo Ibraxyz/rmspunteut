@@ -185,7 +185,7 @@ const RMSMakeInvoice = (props) => {
                 let progressCounter = 0;
                 let totalDataLength = k_data.length;
                 let step = 100 / totalDataLength;
-                //get data for biaya bulanan
+                //get data for biaya bulanan (for the biaya id)
                 const bb = await getDoc(doc(db, `bb/bb1`));
                 let idBiaya_ = null;
                 if (bb.exists()) {
