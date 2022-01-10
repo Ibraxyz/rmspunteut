@@ -1,7 +1,7 @@
 let Obj = require('./home.json');
 
 let homeObj = Obj;
-/** use this for inspect invalid value */
+/** use this for inspect invalid value 
 var fs = require('fs');
 const arr = [];
 const filtered = homeObj.forEach((obj) => {
@@ -13,6 +13,6 @@ const filtered = homeObj.forEach((obj) => {
 fs.writeFile('./src/bulk-upload/home-filtered.json', JSON.stringify(arr), 'utf8', () => {
     console.log('OK')
 });
+*/
 
-
-//export { homeObj }
+export { homeObj }
