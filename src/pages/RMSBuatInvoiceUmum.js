@@ -371,13 +371,13 @@ const RMSBuatInvoiceUmum = (props) => {
         let namaDaftarTagihanArr = [];
         //tagihan sub obj
         let tagihanObject = ic_st_invoiceList.map((inv) => {
-            namaDaftarTagihanArr.push(inv.nama + ` | ` + inv.variant);
+            namaDaftarTagihanArr.push(inv.nama + ` `);
             totalBiaya += parseInt(inv['total-harga']);
             return {
                 biaya: inv['total-harga'],
                 id: inv.id,
                 qty: inv.jumlah,
-                jenis: inv.nama + ` | ` + inv.variant + ` ( x ${inv.jumlah} )`
+                jenis: inv.nama + ` ( x ${inv.jumlah} )`
             }
         });
         obj["subtotal"] = totalBiaya;
