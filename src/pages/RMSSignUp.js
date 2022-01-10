@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth } from '../index';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 //redux
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { bindActionCreators } from 'redux';
 import { actionCreators } from "../state/index";
 //material-ui
@@ -109,11 +109,19 @@ const RMSSignUp = (props) => {
     const [name, setName] = useState([]);
     const [isSnackbarShown, setIsSnackbarShown] = useState(false);
     const [message, setMessage] = useState("");
+    //check current user
+    const r_currentUser = useSelector((state) => state.currentUser);
     useEffect(() => {
         return () => {
-            console.log('rmssignup unmounted')
+            console.log('rmssignup unmounted');
         };
     }, [])
+    useEffect(() => {
+        ic_st_setIsLoading(true);
+        setTimeout(() => {
+            ic_st_setIsLoading(false);
+        }, 1000)
+    }, [r_currentUser])
     return (
         <Box sx={{ display: props.display }}>
             <LinearProgress color="secondary" sx={{ display: ic_st_isLoading ? 'default' : 'none' }} />

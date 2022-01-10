@@ -103,11 +103,6 @@ const InputKK = (props) => {
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
-            if (i === 500 || i === 1000 || i === 1500 || i === 2000 || i === 2500 || i === 3000) {
-                setTimeout(() => {
-                    console.log('break...');
-                }, 1000)
-            }
         }
     }
     useEffect(() => {

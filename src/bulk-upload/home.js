@@ -12,7 +12,7 @@ function read(file, cb) {
     });
 }
 
-read('./home-source.txt', function (data) {
+read('./src/bulk-upload/home-source.txt', function (data) {
     let newData = [];
     for (let d in data) {
         let replaced = data[d].replace(/\t/i, ' ');
@@ -26,7 +26,7 @@ read('./home-source.txt', function (data) {
         });
     }
     console.log(newData);
-    fs.writeFile('./home.json', JSON.stringify(newData), 'utf8', ()=>{
+    fs.writeFile('./src/bulk-upload/home.json', JSON.stringify(newData), 'utf8', () => {
         console.log('OK')
     });
     homeJson = newData;
