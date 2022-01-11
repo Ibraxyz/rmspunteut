@@ -122,15 +122,20 @@ const InputKK = (props) => {
             setBiayaBulanan(pureListKategori[kategoriBangunan]);
         }
     }, [kategoriBangunan]);
+    const addBlokCollection = async () => {
+        const blokList = await getDoc(doc(db, `blok/${obj.blok}`));
+        if (!blokList.exists()) {
+            await setDoc(doc(db, `blok/${obj.blok}`), {
+                "nama": obj.blok,
+            })
+        }
+    }
     const submitKk = async () => {
         try {
-            await submitAction(obj);
-            const blokList = await getDoc(doc(db, `blok/${obj.blok}`));
-            if (!blokList.exists()) {
-                await setDoc(doc(db, `blok/${obj.blok}`), {
-                    "nama": obj.blok,
-                })
-            }
+            //await submitAction(obj) || await addData(obj);
+            await setDoc(doc(db, `kk/${blok}${noRumah}`), obj);
+            /** add blok to the blok collections if not exist */
+            await addBlokCollection();
             //await baddData()
             setBlok("");
             setEmail("");
