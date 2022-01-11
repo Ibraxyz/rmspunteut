@@ -101,7 +101,7 @@ const InputKK = (props) => {
                 if (alreadyExistedHome.includes(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`)) {
                     typoRef.current.innerHTML = `${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()} is already pushed to the database, so not inserting it...`;
                 } else {
-                    const docRef = await setDoc(doc(db, `kk/${blok}${noRumah}`), {
+                    const docRef = await setDoc(doc(db, `kk/${homeObj[i]['blok'].toUpperCase}${homeObj[i]['no'].toUpperCase()}`), {
                         "blok": homeObj[i]['blok'].toUpperCase(),
                         "no_rumah": homeObj[i]['no'].toUpperCase(),
                         "biaya-bulanan": homeObj[i]['ikk'],
