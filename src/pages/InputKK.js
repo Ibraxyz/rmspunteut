@@ -213,10 +213,10 @@ const InputKK = (props) => {
                         <RMSTextField isError={blok.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Blok"} helperText={"Masukkan Blok"} value={blok} handleChange={(value) => setBlok(value.toUpperCase())} />
                         <RMSTextField isError={noRumah.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Nomor Rumah"} helperText={"Masukkan Nomor Rumah"} value={noRumah} handleChange={(value) => setNoRumah(value.toUpperCase())} />
                         <RMSSelect
-                            isError={false}
+                            isError={kategoriBlok.length === 0 && isAlertShown}
                             isRequired={true}
                             displayFilter={"default"}
-                            label={"Kategori Blok"}
+                            label={"Kategori Blok *"}
                             helperText={"Masukkan Kategori Blok"}
                             value={kategoriBlok}
                             items={kategoriBlokList}
@@ -242,6 +242,7 @@ const InputKK = (props) => {
                                 isManuallyInputIKK ? biayaBulanan : kategoriBangunan,
                                 noRumah,
                                 blok,
+                                kategoriBlok,
                                 //email,
                                 //hp,
                                 //telp,
