@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Paper, Stack, Button, Snackbar, Alert, Divider, Typography, Container } from "@mui/material";
+import { Box, Paper, Stack, Button, Snackbar, Alert, Divider, Typography, FormHelperText, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import RMSTextField from "../components/RMSTextField";
 import RMSSelect from "../components/RMSSelect";
 import RMSDatePicker from "../components/RMSDatePicker";
@@ -47,6 +47,22 @@ const InputKK = (props) => {
     const [isManuallyInputIKK, setIsManuallyInputIKK] = useState(true);
     const [isRumahKosong, setIsRumahKosong] = useState(false);
     const [isTMB, setIsTMB] = useState(false);
+    const [kategoriBlok, setKategoriBlok] = useState("");
+    //TASBI_I_AA-ZZ  TASBI_II TASBI_I_A-N
+    const kategoriBlokList = [
+        {
+            "text": 'Tasbi 1 dari blok A s/d N',
+            "value": 'TASBI_I_A-N',
+        },
+        {
+            "text": 'Tasbi 1 blok Ganda',
+            "value": 'TASBI_I_AA-ZZ',
+        },
+        {
+            "text": 'Tasbi 2',
+            "value": 'TASBI_II',
+        }
+    ]
     const now = getSeparatedDate(Date.now());
     const obj = {
         "biaya-bulanan": biayaBulanan,
@@ -138,10 +154,15 @@ const InputKK = (props) => {
         if (!blokList.exists()) {
             await setDoc(doc(db, `blok/${obj.blok.toUpperCase()}`), {
                 "nama": obj.blok.toUpperCase(),
+                "kategori": kategoriBlok
             })
         }
     }
     const submitKk = async () => {
+        if(kategoriBlok === ""){
+            alert('Mohon pilih kategori blok');
+            return;
+        }
         try {
             //await submitAction(obj) || await addData(obj);
             await setDoc(doc(db, `kk/${blok.toUpperCase()}${noRumah.toUpperCase()}`), obj);
@@ -177,7 +198,7 @@ const InputKK = (props) => {
                 </Box>
                 <Box sx={{ padding: '10px' }}>
                     <Typography variant={'h6'} content={'div'}>Input KK</Typography>
-                    <Typography variant={'caption'} content={'div'}>Pada form input kk ini, input yang harus diisi hanya ( kategori bangunan / biaya bulanan ), blok dan nomor rumah saja. Inputan yang lain hanya opsional.</Typography>
+                    <Typography variant={'caption'} content={'div'}>Pada form input kk ini, input yang harus diisi hanya ( kategori bangunan / biaya bulanan ), blok, kategori blok dan nomor rumah saja. Inputan yang lain hanya opsional.</Typography>
                 </Box>
                 <Divider />
                 <Box sx={{ padding: "10px" }}>
@@ -191,6 +212,16 @@ const InputKK = (props) => {
                         }
                         <RMSTextField isError={blok.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Blok"} helperText={"Masukkan Blok"} value={blok} handleChange={(value) => setBlok(value.toUpperCase())} />
                         <RMSTextField isError={noRumah.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Nomor Rumah"} helperText={"Masukkan Nomor Rumah"} value={noRumah} handleChange={(value) => setNoRumah(value.toUpperCase())} />
+                        <RMSSelect
+                            isError={false}
+                            isRequired={true}
+                            displayFilter={"default"}
+                            label={"Kategori Blok"}
+                            helperText={"Masukkan Kategori Blok"}
+                            value={kategoriBlok}
+                            items={kategoriBlokList}
+                            handleChange={(value) => { setKategoriBlok(value); }}
+                        />
                         <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Nomor KK (Opsional)"} helperText={"Masukkan Nomor KK"} value={noKk} handleChange={(value) => setNoKk(value)} />
                         <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Email (Opsional)"} helperText={"Masukkan Email"} value={email} handleChange={(value) => setEmail(value)} />
                         <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"HP (Opsional)"} helperText={"Masukkan Nomor HP"} value={hp} handleChange={(value) => setHp(value)} />
@@ -224,7 +255,7 @@ const InputKK = (props) => {
                                         //if kk is already exist so do nothing;
                                         alert(`Data Blok ${blok} dan Nomor Rumah ${noRumah} sudah ada di dalam database. Jadi tidak diupload lagi...`);
                                     } else {
-                                        submitKk(); // if same date is not exist, submit the new kk
+                                        submitKk(); // if same data is not exist, submit the new kk
                                     }
                                 } catch (err) {
                                     console.log(err.message);
