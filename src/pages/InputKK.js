@@ -91,17 +91,29 @@ const InputKK = (props) => {
         getListKategori();
     }, []);
     const bulkUpload = async () => {
+        /** this array ( alreadyExistedHome ) used to contain already pushed data to the database...
+        this also used to prevent multiple checking to the database whether the same home already existed or not.
+        so this will avoid unneccessary request to the db server, which is hopefully will save some quotas... .*/
+        const alreadyExistedHome = [];
         for (let i = 0; i < homeObj.length; i++) {
             try {
-                const docRef = await addDoc(collection(db, 'kk'), {
-                    "blok": homeObj[i]['blok'].toUpperCase(),
-                    "no_rumah": homeObj[i]['no'].toUpperCase(),
-                    "biaya-bulanan": homeObj[i]['ikk']
-                });
-                console.log("Document written with ID: ", docRef.id);
-                typoRef.current.innerHTML = `${homeObj[i]['blok']} | ${homeObj[i]['no']} telah ditambahkan.. | ${i}/${homeObj.length} ( ${Math.ceil((i / homeObj.length) * 100)} %)`;
+                //if same blok and home number already exist, dont insert it to the database
+                if (alreadyExistedHome.includes(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`)) {
+                    typoRef.current.innerHTML = `${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()} is already pushed to the database, so not inserting it...`;
+                } else {
+                    const docRef = await addDoc(collection(db, 'kk'), {
+                        "blok": homeObj[i]['blok'].toUpperCase(),
+                        "no_rumah": homeObj[i]['no'].toUpperCase(),
+                        "biaya-bulanan": homeObj[i]['ikk']
+                    });
+                    //push existed home to the array
+                    alreadyExistedHome.push(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`);
+                    console.log("Document written with ID: ", docRef.id);
+                    typoRef.current.innerHTML = `${homeObj[i]['blok']} | ${homeObj[i]['no']} telah ditambahkan.. | ${i}/${homeObj.length} ( ${Math.ceil((i / homeObj.length) * 100)} %)`;
+                }
             } catch (e) {
-                console.error("Error adding document: ", e);
+                console.error("Error adding document: ", e.message);
+                typoRef.current.innerHTML = e.message;
             }
         }
     }
