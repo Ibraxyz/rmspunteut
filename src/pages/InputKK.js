@@ -121,7 +121,30 @@ const InputKK = (props) => {
         if (!isManuallyInputIKK) {
             setBiayaBulanan(pureListKategori[kategoriBangunan]);
         }
-    }, [kategoriBangunan])
+    }, [kategoriBangunan]);
+    const submitKk = async () => {
+        try {
+            await submitAction(obj);
+            const blokList = await getDoc(doc(db, `blok/${obj.blok}`));
+            if (!blokList.exists()) {
+                await setDoc(doc(db, `blok/${obj.blok}`), {
+                    "nama": obj.blok,
+                })
+            }
+            //await baddData()
+            setBlok("");
+            setEmail("");
+            setHp("");
+            setNoKk("");
+            setNoRumah("");
+            setTanggalBergabung(""); //ok
+            setTelp(""); //ok
+            setStatusAktif("");
+            setIsSuccessCreatingTagihanShow(true);
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
     return (
         <Box style={{ marginBottom: "20px" }}>
             <Paper>
@@ -178,26 +201,18 @@ const InputKK = (props) => {
                                 //statusAktif,
                                 //tanggalBergabung
                             ])) {
+                                //check db whether the same home is already exist or not.
                                 try {
-                                    await submitAction(obj);
-                                    const blokList = await getDoc(doc(db, `blok/${obj.blok}`));
-                                    if (!blokList.exists()) {
-                                        await setDoc(doc(db, `blok/${obj.blok}`), {
-                                            "nama": obj.blok,
-                                        })
+                                    const kkCheck = await getDoc(doc(db, `kk/${blok}${noRumah}`));
+                                    if (kkCheck.exists()) {
+                                        //if kk is already exist so do nothing;
+                                        alert(`Data Blok ${blok} dan Nomor Rumah ${noRumah} sudah ada di dalam database. Jadi tidak diupload lagi...`);
+                                    } else {
+                                        submitKk(); // if same date is not exist, submit the new kk
                                     }
-                                    //await baddData()
-                                    setBlok("");
-                                    setEmail("");
-                                    setHp("");
-                                    setNoKk("");
-                                    setNoRumah("");
-                                    setTanggalBergabung(""); //ok
-                                    setTelp(""); //ok
-                                    setStatusAktif("");
-                                    setIsSuccessCreatingTagihanShow(true);
-                                } catch (error) {
-                                    console.log(error.message);
+                                } catch (err) {
+                                    console.log(err.message);
+                                    alert(err.message);
                                 }
                             }
                         }}>Input KK</Button>
