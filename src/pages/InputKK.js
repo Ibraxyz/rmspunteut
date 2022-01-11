@@ -178,6 +178,7 @@ const InputKK = (props) => {
             setTelp(""); //ok
             setStatusAktif("");
             setIsSuccessCreatingTagihanShow(true);
+            setKategoriBlok("");
         } catch (error) {
             console.log(error.message);
         }
