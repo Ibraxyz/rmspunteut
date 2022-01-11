@@ -210,7 +210,7 @@ const RMSMakeInvoice = (props) => {
                     obj["potongan"] = 0;
                     obj["biaya"] = totalBiaya;
                     obj['banyak-biaya'] = 1;
-                    obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok;
+                    obj["blok"] = k_data[i].blok === undefined ? "undefined" : k_data[i].blok.toUpperCase();
                     obj["email"] = k_data[i].email === undefined ? "undefined" : k_data[i].email;
                     obj["tagihan"] = tagihanObject;
                     obj["nama-daftar-tagihan"] = namaDaftarTagihan.filter((daftar) => {
@@ -218,7 +218,7 @@ const RMSMakeInvoice = (props) => {
                         return daftar !== undefined;
                     });;
                     obj["nomor-kk"] = k_data[i].no_kk === undefined ? "undefined" : k_data[i].no_kk;
-                    obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah;
+                    obj["nomor-rumah"] = k_data[i].no_rumah === undefined ? "undefined" : k_data[i].no_rumah.toUpperCase();
                     obj["sisa"] = totalBiaya;
                     obj["status-invoice"] = false;
                     obj["sudah-dibayar"] = 0;

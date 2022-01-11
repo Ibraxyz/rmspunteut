@@ -447,9 +447,9 @@ const RMSBuatInvoiceUmum = (props) => {
                         aazz={ic_st_aazz}
                         tasbiII={ic_st_tasbiII}
                         value={ic_st_blok}
-                        handleChange={(value) => { resetItemList(); ic_st_setBlok(value); ic_st_setActiveVariant(constructVariant(value)); }}
+                        handleChange={(value) => { resetItemList(); ic_st_setBlok(value.toUpperCase()); ic_st_setActiveVariant(constructVariant(value)); }}
                     />
-                    <RMSTextField isError={false} isRequired={false} type={"text"} displayFilter={'default'} label={'Nomor Rumah'} helperText={'Masukkan Nomor Rumah'} value={ic_st_no} handleChange={(value) => { ic_st_setNo(value); }} />
+                    <RMSTextField isError={false} isRequired={false} type={"text"} displayFilter={'default'} label={'Nomor Rumah'} helperText={'Masukkan Nomor Rumah'} value={ic_st_no} handleChange={(value) => { ic_st_setNo(value.toUpperCase()); }} />
                     <RMSSelect isError={false} isRequired={true} displayFilter={'default'} label={'Kategori'} helperText={'Kategori Invoice'} items={["bulanan", "retribusi", "custom"].map((alphabet) => { return { "text": alphabet, "value": alphabet } })} value={ic_st_category} handleChange={(value) => { ic_st_setCategory(value); }} />
                 </Box>
                 <Divider />

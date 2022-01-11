@@ -94,8 +94,8 @@ const InputKK = (props) => {
         for (let i = 0; i < homeObj.length; i++) {
             try {
                 const docRef = await addDoc(collection(db, 'kk'), {
-                    "blok": homeObj[i]['blok'],
-                    "no_rumah": homeObj[i]['no'],
+                    "blok": homeObj[i]['blok'].toUpperCase(),
+                    "no_rumah": homeObj[i]['no'].toUpperCase(),
                     "biaya-bulanan": homeObj[i]['ikk']
                 });
                 console.log("Document written with ID: ", docRef.id);
@@ -138,8 +138,8 @@ const InputKK = (props) => {
                                 :
                                 <RMSSelect isError={false} isRequired={true} displayFilter={"default"} label={"Kategori Bangunan"} helperText={"Masukkan Kategori Bangunan"} value={kategoriBangunan} items={listKategoriBangunan} handleChange={(value) => { setKategoriBangunan(value); }} />
                         }
-                        <RMSTextField isError={blok.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Blok"} helperText={"Masukkan Blok"} value={blok} handleChange={(value) => setBlok(value)} />
-                        <RMSTextField isError={noRumah.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Nomor Rumah"} helperText={"Masukkan Nomor Rumah"} value={noRumah} handleChange={(value) => setNoRumah(value)} />
+                        <RMSTextField isError={blok.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Blok"} helperText={"Masukkan Blok"} value={blok} handleChange={(value) => setBlok(value.toUpperCase())} />
+                        <RMSTextField isError={noRumah.length === 0 && isAlertShown ? true : false} isRequired={true} displayFilter={"default"} label={"Nomor Rumah"} helperText={"Masukkan Nomor Rumah"} value={noRumah} handleChange={(value) => setNoRumah(value.toUpperCase())} />
                         <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Nomor KK (Opsional)"} helperText={"Masukkan Nomor KK"} value={noKk} handleChange={(value) => setNoKk(value)} />
                         <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Email (Opsional)"} helperText={"Masukkan Email"} value={email} handleChange={(value) => setEmail(value)} />
                         <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"HP (Opsional)"} helperText={"Masukkan Nomor HP"} value={hp} handleChange={(value) => setHp(value)} />
