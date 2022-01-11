@@ -111,8 +111,6 @@ const InputKK = (props) => {
         this also used to prevent multiple checking to the database whether the same home already existed or not.
         so this will avoid unneccessary request to the db server, which is hopefully will save some quotas... .*/
         const alreadyExistedHome = [];
-        /** this array used to track already existed 'blok' at client side */
-        const alreadyExistBlok = [];
         for (let i = 0; i < homeObj.length; i++) {
             try {
                 //if same blok and home number already exist, dont insert it to the database
@@ -126,15 +124,6 @@ const InputKK = (props) => {
                     });
                     //push existed home to the array
                     alreadyExistedHome.push(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`);
-                    //push not existed blok to the array
-                    if (!alreadyExistBlok.includes(homeObj[i]['blok'].toUpperCase())) {
-                        //push existed blok to the db fisrt...
-                        await setDoc(doc(db, `blok/${homeObj[i]['blok'].toUpperCase()}`), {
-                            "nama": homeObj[i]['blok'].toUpperCase(),
-                        })
-                        //and then push existed blok to array;
-                        alreadyExistBlok.push(homeObj[i]['blok'].toUpperCase());
-                    }
                     console.log("Document written with ID: ", docRef.id);
                     typoRef.current.innerHTML = `${homeObj[i]['blok']} | ${homeObj[i]['no']} telah ditambahkan.. | ${i}/${homeObj.length} ( ${Math.ceil((i / homeObj.length) * 100)} %)`;
                 }
