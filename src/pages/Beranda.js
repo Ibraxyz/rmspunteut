@@ -91,12 +91,6 @@ const Beranda = () => {
     const [ic_st_totalPemasukanAllTime, ic_st_setTotalPemasukanAllTime] = useState(0);
     const [ic_st_perBlokLabel, ic_st_setPerBlokLabel] = useState([]);
     const [ic_st_graphData, ic_st_setGraphData] = useState(graphData)
-    //mock state
-    const [mock, setMock] = useState('r');
-    useEffect(() => {
-        console.log('mock', mock);
-        setMock('q');
-    }, [mock])
     //effect
     useEffect(() => {
         updateCurrentPath("Beranda");
