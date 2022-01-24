@@ -45,11 +45,11 @@ function RMSTempDrawer(props) {
             <Divider />
             <List>
                 <Link to="/input-kk" style={{ textDecoration: "none", color: "initial" }}>
-                    <ListItem button key={"Input KK"}>
+                    <ListItem button key={"Input Rumah"}>
                         <ListItemIcon>
                             <AddReactionIcon />
                         </ListItemIcon>
-                        <ListItemText primary={"Input KK"} />
+                        <ListItemText primary={"Input Rumah"} />
                     </ListItem>
                 </Link>
                 <Link to="/lihat-kk" style={{ textDecoration: "none", color: "initial" }}>

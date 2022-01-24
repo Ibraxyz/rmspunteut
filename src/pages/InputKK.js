@@ -111,7 +111,7 @@ const InputKK = (props) => {
         this also used to prevent multiple checking to the database whether the same home already existed or not.
         so this will avoid unneccessary request to the db server, which is hopefully will save some quotas... .*/
         const alreadyExistedHome = [];
-        for (let i = 0; i < homeObj.length; i++) {
+        for (let i = 0; i < 5; i++) { //homeObj.length
             try {
                 //if same blok and home number already exist, dont insert it to the database
                 if (alreadyExistedHome.includes(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`)) {
@@ -187,8 +187,8 @@ const InputKK = (props) => {
                     <RMSSwitch label={'IKK berdasarkan kategori bangunan'} handleChange={(v) => { setBiayaBulanan([]); setIsManuallyInputIKK(!v) }} />
                 </Box>
                 <Box sx={{ padding: '10px' }}>
-                    <Typography variant={'h6'} content={'div'}>Input KK</Typography>
-                    <Typography variant={'caption'} content={'div'}>Pada form input kk ini, input yang harus diisi hanya ( kategori bangunan / biaya bulanan ), blok, kategori blok dan nomor rumah saja. Inputan yang lain hanya opsional.</Typography>
+                    <Typography variant={'h6'} content={'div'}>Input Rumah</Typography>
+                    <Typography variant={'caption'} content={'div'}>Pada form input Rumah ini, input yang harus diisi hanya ( kategori bangunan / biaya bulanan ), blok, kategori blok dan nomor rumah.</Typography>
                 </Box>
                 <Divider />
                 <Box sx={{ padding: "10px" }}>
@@ -212,11 +212,11 @@ const InputKK = (props) => {
                             items={kategoriBlokList}
                             handleChange={(value) => { setKategoriBlok(value); }}
                         />
-                        <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Nomor KK (Opsional)"} helperText={"Masukkan Nomor KK"} value={noKk} handleChange={(value) => setNoKk(value)} />
-                        <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Email (Opsional)"} helperText={"Masukkan Email"} value={email} handleChange={(value) => setEmail(value)} />
-                        <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"HP (Opsional)"} helperText={"Masukkan Nomor HP"} value={hp} handleChange={(value) => setHp(value)} />
+                        {/** <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Nomor KK (Opsional)"} helperText={"Masukkan Nomor KK"} value={noKk} handleChange={(value) => setNoKk(value)} /> */}
+                        {/** <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Email (Opsional)"} helperText={"Masukkan Email"} value={email} handleChange={(value) => setEmail(value)} /> */}
+                        {/** <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"HP (Opsional)"} helperText={"Masukkan Nomor HP"} value={hp} handleChange={(value) => setHp(value)} /> */}
                         {/** <RMSDatePicker isError={tanggalBergabung.length === 0 && isAlertShown ? true : false} isRequired={false} displayFilter={"default"} label={"Tanggal Bergabung"} helperText={"Tanggal Bergabung"} value={tanggalBergabung} handleChange={(value) => setTanggalBergabung(value)} /> **/}
-                        <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Nomor Telp (Opsional)"} helperText={"Masukkan Nomor Telp"} value={telp} handleChange={(value) => setTelp(value)} />
+                        {/** <RMSTextField isError={false} isRequired={false} displayFilter={"default"} label={"Nomor Telp (Opsional)"} helperText={"Masukkan Nomor Telp"} value={telp} handleChange={(value) => setTelp(value)} /> **/}
                         {/**
                          * <Box sx={{ padding: '10px' }}>
                             <RMSSwitch label={'Rumah Kosong'} handleChange={(v) => { setIsRumahKosong(v); }} />
