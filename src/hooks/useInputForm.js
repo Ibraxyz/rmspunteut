@@ -4,7 +4,7 @@ import usePathUpdater from "../hooks/usePathUpdater";
 
 const useInputForm = (jenisForm) => {
     //redux 
-    const [r_state] = usePathUpdater(jenisForm == 'kk' ? "Input KK" : jenisForm == 'invoice' ? "Buat Invoice" : "");
+    const [r_state] = usePathUpdater(jenisForm == 'kk' ? "Input Rumah" : jenisForm == 'invoice' ? "Buat Invoice" : "");
     const [isLoading, data, addData, getData, editData, deleteData] = useDataOperations(jenisForm);
     //alert visibility state
     const [isSuccessCreatingTagihanShow, setIsSuccessCreatingTagihanShow] = useState(false);

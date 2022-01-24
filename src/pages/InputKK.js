@@ -253,13 +253,13 @@ const InputKK = (props) => {
                                     alert(err.message);
                                 }
                             }
-                        }}>Input KK</Button>
+                        }}>Input Rumah</Button>
                     </Stack>
                 </Box>
             </Paper>
             <Snackbar open={isSuccessCreatingTagihanShow} autoHideDuration={2000} onClose={() => { setIsSuccessCreatingTagihanShow(false) }}>
                 <Alert onClose={() => { setIsSuccessCreatingTagihanShow(false) }} severity="success" sx={{ width: '100%' }}>
-                    KK berhasil diinput.
+                    Rumah berhasil diinput.
                 </Alert>
             </Snackbar>
         </Box>

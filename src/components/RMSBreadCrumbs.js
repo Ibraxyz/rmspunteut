@@ -26,7 +26,7 @@ const RMSBreadCrumbs = () => {
                 setPath([{ "name": "Beranda", "link": "/" }, { "name": "Lihat Tagihan", "link": "/lihat-tagihan" }, { "name": "Cetak Kuitansi", "link": "/cetak-kuitansi" }]);
                 break;
             case "Input KK":
-                setPath([{ "name": "Beranda", "link": "/" }, { "name": "Input KK", "link": "/input-kk" }]);
+                setPath([{ "name": "Beranda", "link": "/" }, { "name": "Input Rumah", "link": "/input-kk" }]);
                 break;
             case "Lihat KK":
                 setPath([{ "name": "Beranda", "link": "/" }, { "name": "Lihat KK", "link": "/lihat-kk" }]);

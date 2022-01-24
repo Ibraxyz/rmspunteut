@@ -53,11 +53,11 @@ function RMSTempDrawer(props) {
                     </ListItem>
                 </Link>
                 <Link to="/lihat-kk" style={{ textDecoration: "none", color: "initial" }}>
-                    <ListItem button key={"Lihat KK"}>
+                    <ListItem button key={"Lihat Rumah"}>
                         <ListItemIcon>
                             <FamilyRestroomIcon />
                         </ListItemIcon>
-                        <ListItemText primary={"Lihat KK"} />
+                        <ListItemText primary={"Lihat Rumah"} />
                     </ListItem>
                 </Link>
             </List>
