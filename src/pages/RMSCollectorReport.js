@@ -1,7 +1,17 @@
 import React from 'react';
-import { Paper, Divider, } from '@mui/material';
+import { Box, Paper, Divider, Typography } from '@mui/material';
 
-const Filter = ({ header }) => {
+/** this pages reporting transaction based on collectors who processed the payment */
+
+const Filter = () => {
+  return (
+    <Box sx={{ padding: '10px' }}>
+      <Typography vairant={'subtitle2'} >Filter</Typography>
+    </Box>
+  )
+}
+
+const Table = ({ header }) => {
   return (
     <div>
       {
@@ -15,13 +25,31 @@ const Filter = ({ header }) => {
   )
 }
 
+const PageContent = ({ children }) => {
+  const [filter, table] = children;
+  return (
+    <Paper>
+      {/** filter */}
+      <Box sx={{ padding: '10px' }}>
+        {filter}
+      </Box>
+      <Divider />
+      {/** table */}
+      <Box sx={{ padding: '10px' }}>
+        {table}
+      </Box>
+    </Paper>
+  )
+}
+
 function RMSCollectorReport() {
   return (
-    <div>
-      {/** filter bulan tahun hari */}
-      <Filter header={["Kolektor1", "Kolektor2", "Kolektor3"]} />
-      {/** tampilan table  */}
-    </div>
+    <>
+      <PageContent>
+        <Filter />
+        <Table header={['Kolektor1', 'Kolektor2', 'Kolektor3']} />
+      </PageContent>
+    </>
   );
 }
 
