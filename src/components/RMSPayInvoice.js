@@ -8,7 +8,7 @@ import RMSDatePicker from './RMSDatePicker';
 //redux
 import { useSelector } from "react-redux";
 //utility
-import { createReport, createIkkReport } from '../rms-utility/rms-utility';
+import { createReport, createIkkReport, getSeparatedDate } from '../rms-utility/rms-utility';
 import RMSSnackbar from '../components/RMSSnackbar';
 import useSnackbar from '../hooks/useSnackbar';
 
@@ -141,11 +141,14 @@ const RMSPayInvoice = (props) => {
                         <Button startIcon={<RotateLeftIcon />} onClick={ic_sf_reset} variant="outlined" disabled={false}>Reset</Button>
                         <Button startIcon={<CancelIcon />} onClick={props.cancelEdit} variant="outlined" disabled={false}>Batal</Button>
                         <Button startIcon={<CheckIcon />} onClick={async () => {
+                            const now = Date.now();
+                            const separatedDate = getSeparatedDate(now);
                             await props.updateData(ic_st_id, 'invoice', {
                                 'sudah-dibayar': parseInt(ic_st_pembayaranSekarang) + parseInt(ic_st_sudahDibayar),
                                 'status-invoice': ic_st_statusInvoice === 'BELUM LUNAS' ? false : true,
                                 'sisa': parseInt(ic_st_sisa),
                                 'tanggal-dibayar': Date.now(),
+                                'hari' : separatedDate.day,
                                 'kolektor': r_currentUser === null ? '-' : r_currentUser
                             });
                             try {
