@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Divider, Typography } from '@mui/material';
+import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody } from '@mui/material';
 import { db } from '../';
 import { collection, doc, getDocs, query, where } from 'firebase/firestore';
 
@@ -12,18 +12,40 @@ const Filter = () => {
     </Box>
   )
 }
-
-const Table = ({ header }) => {
+/** total ikk kolektor1 tgl 1 bulan x tahun x */
+const RMSBaseTable = ({ header }) => {
   return (
-    <div>
-      {
-        header.map((h) => {
-          return (
-            <h3 key={'header-' + h}>{h}</h3>
-          )
-        })
-      }
-    </div>
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            {
+              header.map((h) => {
+                return <TableCell key={'tableCellHeader-'+h} align="right">{h}</TableCell>
+              })
+            }
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {/**
+           * {rows.map((row) => (
+            <TableRow
+              key={row.name}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.name}
+              </TableCell>
+              <TableCell align="right">{row.calories}</TableCell>
+              <TableCell align="right">{row.fat}</TableCell>
+              <TableCell align="right">{row.carbs}</TableCell>
+              <TableCell align="right">{row.protein}</TableCell>
+            </TableRow>
+          ))}
+           */}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }
 
@@ -51,6 +73,8 @@ function RMSCollectorReport() {
   const [tahun, setTahun] = useState(null);
   /** define current columnHeader state */;
   const [columnHeaderState, setColumnHeaderState] = useState([]);
+  /** hold collector list state */
+  const [collectorList,setCollectorList] = useState([]);
   /** define column header array */
   const columnHeader = [];
   /** add tgl as first element of the array */
@@ -63,13 +87,18 @@ function RMSCollectorReport() {
     ]
     const getKolektorList = async () => {
       try {
+        /** temp aray fro holding cuurent collecctor list from db */
+        const currentCollectorList = [];
         const userCollection = await getDocs(query(userQuery, ...conditions));
         userCollection.forEach((doc) => {
           console.log(JSON.stringify(doc.data()))
           const docData = doc.data();
           /** push kolektors name and id to the columnHeader array */
-          columnHeader.push(`${docData["name"]} (${docData["uid"]})`);
+          columnHeader.push(`${docData["name"]}`);
+          currentCollectorList.push(docData["name"]);
         });
+        /** update current collector list state */
+        setCollectorList(currentCollectorList);
         /** finally, add total as the last element of the columnHeader array */
         columnHeader.push('TOTAL');
         columnHeader.push('AKSI');
@@ -81,20 +110,21 @@ function RMSCollectorReport() {
     getKolektorList();
   }, []);
   /** get data  */
-  const getInvoiceData = async()=>{
+  const getInvoiceData = async () => {
     /** prevent processing data if data === null */
-    if(bulan === null || tahun === null){
+    if (bulan === null || tahun === null) {
       alert('Mohon pilih bulan dan tahun');
       return;
     }
     /** holder for invoice data */
-    const invoiceTableData = [];
-    try{
-      const invoicesData = await getDocs(query(collection(db,`invoice`),where('bulan','==',bulan),where('tahun','==',tahun)));
-      invoicesData.forEach((doc)=>{
 
+    /** get invoices data */
+    try {
+      const invoicesData = await getDocs(query(collection(db, `invoice`), where('bulan', '==', bulan), where('tahun', '==', tahun)));
+      invoicesData.forEach((doc) => {
+        
       })
-    }catch(err){
+    } catch (err) {
       console.log(err.message);
     }
   }
@@ -102,7 +132,7 @@ function RMSCollectorReport() {
     <>
       <PageContent>
         <Filter />
-        <Table header={columnHeaderState} />
+        <RMSBaseTable header={columnHeaderState} />
       </PageContent>
     </>
   );
