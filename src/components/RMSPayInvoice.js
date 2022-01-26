@@ -41,6 +41,10 @@ const RMSPayInvoice = (props) => {
     const [ic_st_bulan, ic_st_setBulan] = useState([]);
     const [ic_st_tahun, ic_st_setTahun] = useState([]);
     const [ic_st_subTotal, ic_st_setSubTotal] = useState([]);
+    /** this state is used to fill the invoice data based on user input, if all of these values are null, the Date.now() will be used */
+    const [ic_st_customBulan, ic_st_setCustomBulan] = useState(null);
+    const [ic_st_customTahun, ic_st_setCustomTahun] = useState(null);
+    const [ic_st_customDay, ic_st_setCustomDay] = useState(null);
     //functions
     const ic_sf_reset = () => {
         let namaDaftarTagihan = ``;
@@ -147,8 +151,10 @@ const RMSPayInvoice = (props) => {
                                 'sudah-dibayar': parseInt(ic_st_pembayaranSekarang) + parseInt(ic_st_sudahDibayar),
                                 'status-invoice': ic_st_statusInvoice === 'BELUM LUNAS' ? false : true,
                                 'sisa': parseInt(ic_st_sisa),
-                                'tanggal-dibayar': Date.now(),
-                                'hari' : separatedDate.day,
+                                'tanggal-dibayar': Date.now(), /** later, never rely on this field, just stick with the separatedDate field on the document */
+                                'hari': ic_st_customDay === null ? separatedDate.day : ic_st_customDay,
+                                'bulan' : ic_st_customBulan === null ? separatedDate.month : ic_st_customBulan,
+                                'tahun' : ic_st_customTahun === null ? separatedDate.year : ic_st_customTahun,
                                 'kolektor': r_currentUser === null ? '-' : r_currentUser
                             });
                             try {
