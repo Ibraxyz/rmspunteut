@@ -79,7 +79,25 @@ function RMSCollectorReport() {
       }
     }
     getKolektorList();
-  }, [])
+  }, []);
+  /** get data  */
+  const getInvoiceData = async()=>{
+    /** prevent processing data if data === null */
+    if(bulan === null || tahun === null){
+      alert('Mohon pilih bulan dan tahun');
+      return;
+    }
+    /** holder for invoice data */
+    const invoiceTableData = [];
+    try{
+      const invoicesData = await getDocs(query(collection(db,`invoice`),where('bulan','==',bulan),where('tahun','==',tahun)));
+      invoicesData.forEach((doc)=>{
+
+      })
+    }catch(err){
+      console.log(err.message);
+    }
+  }
   return (
     <>
       <PageContent>
