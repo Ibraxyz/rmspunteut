@@ -1,6 +1,7 @@
 let Obj = require('./home.json');
 
 let homeObj = Obj;
+
 /** use this for inspect invalid value 
 var fs = require('fs');
 const arr = [];

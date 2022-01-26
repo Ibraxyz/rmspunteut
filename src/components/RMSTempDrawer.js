@@ -128,6 +128,17 @@ function RMSTempDrawer(props) {
             </List>
             <Divider />
             <List>
+                <Link to="/laporan-kolektor/" style={{ textDecoration: "none", color: "initial" }}>
+                    <ListItem button key={"Laporan Kolektor"}>
+                        <ListItemIcon>
+                            <BarChartIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Laporan Kolektor"} />
+                    </ListItem>
+                </Link>
+            </List>
+            <Divider />
+            <List>
                 <Link to="/manage-user" style={{ textDecoration: "none", color: "initial" }}>
                     <ListItem button key={"Pengaturan User"}>
                         <ListItemIcon>

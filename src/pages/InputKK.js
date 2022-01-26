@@ -117,14 +117,14 @@ const InputKK = (props) => {
                 if (alreadyExistedHome.includes(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`)) {
                     typoRef.current.innerHTML = `${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()} is already pushed to the database, so not inserting it...`;
                 } else {
-                    const docRef = await setDoc(doc(db, `kk/${homeObj[i]['blok'].toUpperCase}${homeObj[i]['no'].toUpperCase()}`), {
+                    const docRef = await setDoc(doc(db, `kk/${homeObj[i]['blok'].toUpperCase()}${homeObj[i]['no'].toUpperCase()}`), {
                         "blok": homeObj[i]['blok'].toUpperCase(),
                         "no_rumah": homeObj[i]['no'].toUpperCase(),
                         "biaya-bulanan": homeObj[i]['ikk'],
                     });
+                    console.log(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()} is already pushed to the database`);
                     //push existed home to the array
                     alreadyExistedHome.push(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`);
-                    console.log("Document written with ID: ", docRef.id);
                     typoRef.current.innerHTML = `${homeObj[i]['blok']} | ${homeObj[i]['no']} telah ditambahkan.. | ${i}/${homeObj.length} ( ${Math.ceil((i / homeObj.length) * 100)} %)`;
                 }
             } catch (e) {
@@ -148,7 +148,7 @@ const InputKK = (props) => {
         }
     }
     const submitKk = async () => {
-        if(kategoriBlok === ""){
+        if (kategoriBlok === "") {
             alert('Mohon pilih kategori blok');
             return;
         }
@@ -175,14 +175,12 @@ const InputKK = (props) => {
     return (
         <Box style={{ marginBottom: "20px" }}>
             <Paper>
-                {/**
-                  * <Box sx={{ padding: '10px' }}>
+                <Box sx={{ padding: '10px' }}>
                     <Button variant={'contained'} onClick={() => {
                         bulkUpload();
                     }}>Bulk Upload</Button>
                     <Typography sx={{ marginLeft: '5px' }} variant={'caption'} ref={typoRef}>0</Typography>
                 </Box>
-                  */}
                 <Box sx={{ padding: '10px' }}>
                     <RMSSwitch label={'IKK berdasarkan kategori bangunan'} handleChange={(v) => { setBiayaBulanan([]); setIsManuallyInputIKK(!v) }} />
                 </Box>

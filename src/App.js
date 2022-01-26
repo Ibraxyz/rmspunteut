@@ -56,6 +56,7 @@ import QRCode from 'react-qr-code';
 import { toDate } from 'date-fns';
 import md5 from 'md5';
 import RMSLihatKK from './pages/RMSLihatKK';
+import RMSCollectorReport from './RMSCollectorReport';
 
 export const light = {
   palette: {
@@ -395,6 +396,9 @@ function App() {
                 </Route>
                 <Route path="/input-biaya">
                   <InputBiaya />
+                </Route>
+                <Route path="/laporan-kolektor">
+                  <RMSCollectorReport />
                 </Route>
                 <Route path="/lihat-laporan">
                   <RMSReport />
