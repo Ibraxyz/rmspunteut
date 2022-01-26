@@ -56,7 +56,7 @@ import QRCode from 'react-qr-code';
 import { toDate } from 'date-fns';
 import md5 from 'md5';
 import RMSLihatKK from './pages/RMSLihatKK';
-import RMSCollectorReport from './RMSCollectorReport';
+import RMSCollectorReport from './pages/RMSCollectorReport';
 
 export const light = {
   palette: {
