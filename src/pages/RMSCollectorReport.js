@@ -121,6 +121,13 @@ function RMSCollectorReport() {
     /** get invoices data */
     try {
       const invoicesData = await getDocs(query(collection(db, `invoice`), where('bulan', '==', bulan), where('tahun', '==', tahun)));
+      /** after below forEach iteration, the desired data format will be like this :
+       * [
+       * {"1",totalKolektor1,totalKolektor2,totalSeluruhKolektorPadaTgl1,lihat detail},
+       * {"2",totalKolektor1,totalKolektor2,totalSeluruhKolektorPadaTgl1,lihat detail},
+       * {"3",totalKolektor1,totalKolektor2,totalSeluruhKolektorPadaTgl1,lihat detail}
+       * ]
+       */
       invoicesData.forEach((doc) => {
         
       })
