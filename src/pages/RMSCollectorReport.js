@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody } from '@mui/material';
+import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Button } from '@mui/material';
 import { db } from '../';
 import { collection, doc, getDocs, query, where } from 'firebase/firestore';
 
 /** this pages reporting transaction based on collectors who processed the payment */
 
-const Filter = () => {
+const Filter = ({ showData }) => {
   return (
     <Box sx={{ padding: '10px' }}>
       <Typography vairant={'subtitle2'} >Filter</Typography>
+      <Button variant={'contained'} onClick={showData}>Tampilkan Data</Button>
     </Box>
   )
 }
 /** total ikk kolektor1 tgl 1 bulan x tahun x */
-const RMSBaseTable = ({ header }) => {
+const RMSBaseTable = ({ header, rows }) => {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -21,28 +22,26 @@ const RMSBaseTable = ({ header }) => {
           <TableRow>
             {
               header.map((h) => {
-                return <TableCell key={'tableCellHeader-'+h} align="right">{h}</TableCell>
+                return <TableCell key={'tableCellHeader-' + h} align="right">{h}</TableCell>
               })
             }
           </TableRow>
         </TableHead>
         <TableBody>
-          {/**
-           * {rows.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
-            </TableRow>
-          ))}
-           */}
+          {rows.map((row) => {
+            return (
+              <TableRow
+                key={row.tgl + '-collectopReport'}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                {
+                  header.map((h) => {
+                    return (<TableCell key={h + 'tbody'} align="right">{row[h]}</TableCell>)
+                  })
+                }
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
     </TableContainer>
@@ -74,11 +73,13 @@ function RMSCollectorReport() {
   /** define current columnHeader state */;
   const [columnHeaderState, setColumnHeaderState] = useState([]);
   /** hold collector list state */
-  const [collectorList,setCollectorList] = useState([]);
+  const [collectorList, setCollectorList] = useState([]);
   /** define column header array */
   const columnHeader = [];
+  /** define table rows data state */
+  const [rows, setRows] = useState([]);
   /** add tgl as first element of the array */
-  columnHeader.push("TGL");
+  columnHeader.push("tgl");
   /** get kolektor list from db */
   useEffect(() => {
     const userQuery = collection(db, `user`);
@@ -87,7 +88,7 @@ function RMSCollectorReport() {
     ]
     const getKolektorList = async () => {
       try {
-        /** temp aray fro holding cuurent collecctor list from db */
+        /** temp aray for holding cuurent collecctor list from db */
         const currentCollectorList = [];
         const userCollection = await getDocs(query(userQuery, ...conditions));
         userCollection.forEach((doc) => {
@@ -100,8 +101,8 @@ function RMSCollectorReport() {
         /** update current collector list state */
         setCollectorList(currentCollectorList);
         /** finally, add total as the last element of the columnHeader array */
-        columnHeader.push('TOTAL');
-        columnHeader.push('AKSI');
+        columnHeader.push('total');
+        columnHeader.push('aksi');
         setColumnHeaderState(columnHeader);
       } catch (err) {
         console.log(err.message);
@@ -111,26 +112,64 @@ function RMSCollectorReport() {
   }, []);
   /** get data  */
   const getInvoiceData = async () => {
-    /** prevent processing data if data === null */
+    /** prevent processing data if data === null 
     if (bulan === null || tahun === null) {
       alert('Mohon pilih bulan dan tahun');
       return;
     }
+    */
     /** holder for invoice data */
 
     /** get invoices data */
     try {
-      const invoicesData = await getDocs(query(collection(db, `invoice`), where('bulan', '==', bulan), where('tahun', '==', tahun)));
+      //const invoicesData = await getDocs(query(collection(db, `invoice`), where('bulan', '==', 1), where('tahun', '==', 2022),  where('status', '==', true)));
       /** after below forEach iteration, the desired data format will be like this :
-       * [
-       * {"1",totalKolektor1,totalKolektor2,totalSeluruhKolektorPadaTgl1,lihat detail},
-       * {"2",totalKolektor1,totalKolektor2,totalSeluruhKolektorPadaTgl1,lihat detail},
-       * {"3",totalKolektor1,totalKolektor2,totalSeluruhKolektorPadaTgl1,lihat detail}
+       * const rows = [
+       * {"tgl" : "1",kolektor1 : totalKolektor1,kolektor2 : totalKolektor2,total : totalSeluruhKolektorPadaTgl1,aksi : lihat detail},
+       * {"tgl" : "2",kolektor1 : totalKolektor1,kolektor2 : totalKolektor2,total : totalSeluruhKolektorPadaTgl2,aksi : lihat detail},
+       * {"tgl" : "3",kolektor1 : totalKolektor1,kolektor2 : totalKolektor2,total : totalSeluruhKolektorPadaTgl3,aksi : lihat detail},
        * ]
        */
+      const _rows = [];
+
+      for (var idx = 1; idx <= 31; idx++) {
+        const obj = {
+          "tgl": idx,
+        }
+
+        collectorList.forEach((name) => {
+          const total = 0;
+          /** we will iterate through invoices obj and extract the total for this collector out of it. */
+          obj[name] = total;
+        })
+
+        obj["total"] = 0;
+        obj["aksi"] = 'Lihat Detail';
+
+        _rows.push(obj);
+      }
+
+      setRows(_rows);
+
+      /** check rows object before putting it to the state */
+      console.log('Check rows data', JSON.stringify(_rows));
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  /** get data ver2 */
+  const getInvoiceData2 = async () => {
+    try {
+      const invoicesData = await getDocs(query(collection(db, `invoice`), where('bulan', '==', 1), where('tahun', '==', 2022)));
+      const _invoicesData = [];
       invoicesData.forEach((doc) => {
-        
-      })
+        _invoicesData.push({
+          id: doc.id,
+          ...doc.data()
+        })
+      });
+      console.log('_invoiceeData',JSON.stringify(_invoicesData));
     } catch (err) {
       console.log(err.message);
     }
@@ -138,8 +177,8 @@ function RMSCollectorReport() {
   return (
     <>
       <PageContent>
-        <Filter />
-        <RMSBaseTable header={columnHeaderState} />
+        <Filter showData={getInvoiceData2} />
+        <RMSBaseTable header={columnHeaderState} rows={rows} />
       </PageContent>
     </>
   );
