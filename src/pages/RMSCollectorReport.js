@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Button } from '@mui/material';
 import { db } from '../';
 import { collection, doc, getDocs, query, where } from 'firebase/firestore';
+import { invoicesData } from '../mock-data';
 
 /** this pages reporting transaction based on collectors who processed the payment */
 
@@ -110,66 +111,25 @@ function RMSCollectorReport() {
     }
     getKolektorList();
   }, []);
-  /** get data  */
+
+  /** get data */
   const getInvoiceData = async () => {
-    /** prevent processing data if data === null 
-    if (bulan === null || tahun === null) {
-      alert('Mohon pilih bulan dan tahun');
-      return;
-    }
-    */
-    /** holder for invoice data */
-
-    /** get invoices data */
     try {
-      //const invoicesData = await getDocs(query(collection(db, `invoice`), where('bulan', '==', 1), where('tahun', '==', 2022),  where('status', '==', true)));
-      /** after below forEach iteration, the desired data format will be like this :
-       * const rows = [
-       * {"tgl" : "1",kolektor1 : totalKolektor1,kolektor2 : totalKolektor2,total : totalSeluruhKolektorPadaTgl1,aksi : lihat detail},
-       * {"tgl" : "2",kolektor1 : totalKolektor1,kolektor2 : totalKolektor2,total : totalSeluruhKolektorPadaTgl2,aksi : lihat detail},
-       * {"tgl" : "3",kolektor1 : totalKolektor1,kolektor2 : totalKolektor2,total : totalSeluruhKolektorPadaTgl3,aksi : lihat detail},
-       * ]
-       */
-      const _rows = [];
-
-      for (var idx = 1; idx <= 31; idx++) {
-        const obj = {
-          "tgl": idx,
-        }
-
-        collectorList.forEach((name) => {
-          const total = 0;
-          /** we will iterate through invoices obj and extract the total for this collector out of it. */
-          obj[name] = total;
-        })
-
-        obj["total"] = 0;
-        obj["aksi"] = 'Lihat Detail';
-
-        _rows.push(obj);
-      }
-
-      setRows(_rows);
-
-      /** check rows object before putting it to the state */
-      console.log('Check rows data', JSON.stringify(_rows));
-    } catch (err) {
-      console.log(err.message);
-    }
-  }
-
-  /** get data ver2 */
-  const getInvoiceData2 = async () => {
-    try {
-      const invoicesData = await getDocs(query(collection(db, `invoice`), where('bulan', '==', 1), where('tahun', '==', 2022)));
-      const _invoicesData = [];
-      invoicesData.forEach((doc) => {
-        _invoicesData.push({
-          id: doc.id,
-          ...doc.data()
-        })
-      });
-      console.log('_invoiceeData',JSON.stringify(_invoicesData));
+      /** { tgl: 1, kolektor1: 0, kolektor2: 0, kolektor3: 0, total: 0, aksi: "lihat detail" } */
+      const _rows = {};
+      const obj = {};
+      collectorList.forEach((collector) => {
+        obj[collector] = 0;
+      })
+      invoicesData.forEach((inv) => {
+        _rows[inv.hari] = {
+          "tgl": inv.hari,
+          ...obj,
+          "aksi": "lihat detail"
+        };
+        _rows[inv.hari][inv.kolektor.name] = parseInt(_rows[inv.hari][inv.kolektor.name]) + parseInt(inv.biaya);
+      })
+      console.log(JSON.stringify(_rows));
     } catch (err) {
       console.log(err.message);
     }
@@ -177,7 +137,7 @@ function RMSCollectorReport() {
   return (
     <>
       <PageContent>
-        <Filter showData={getInvoiceData2} />
+        <Filter showData={getInvoiceData} />
         <RMSBaseTable header={columnHeaderState} rows={rows} />
       </PageContent>
     </>
