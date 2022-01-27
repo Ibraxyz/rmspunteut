@@ -111,7 +111,7 @@ const InputKK = (props) => {
         this also used to prevent multiple checking to the database whether the same home already existed or not.
         so this will avoid unneccessary request to the db server, which is hopefully will save some quotas... .*/
         const alreadyExistedHome = [];
-        for (let i = 0; i < 5; i++) { //homeObj.length
+        for (let i = 0; i < homeObj.length; i++) { //homeObj.length
             try {
                 //if same blok and home number already exist, dont insert it to the database
                 if (alreadyExistedHome.includes(`${homeObj[i]['blok'].toUpperCase()}|${homeObj[i]['no'].toUpperCase()}`)) {
