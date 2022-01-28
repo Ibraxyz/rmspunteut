@@ -127,17 +127,19 @@ function RMSCollectorReport() {
       }
       const collectorMonthlyTotal = { ...collectorTotalObj }; /** this holds per collector monthly total per month */
       for (let i = 0; i < invoicesData.length; i++) {
-        collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name] = parseInt(collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
-        let total = 0;
-        Object.keys(collectorTotalDaily[invoicesData[i].hari]).forEach((key) => {
-          total += parseInt(collectorTotalDaily[invoicesData[i].hari][key]);
-        })
-        collectorMonthlyTotal[invoicesData[i].kolektor.name] = parseInt(collectorMonthlyTotal[invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
-        _rows[invoicesData[i].hari] = {
-          "tgl": invoicesData[i].hari,
-          ...collectorTotalDaily[invoicesData[i].hari],
-          "total": total,
-          "aksi": "lihat detail",
+        if (!isNaN(parseInt((invoicesData[i].biaya)))) {
+          collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name] = parseInt(collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
+          let total = 0;
+          Object.keys(collectorTotalDaily[invoicesData[i].hari]).forEach((key) => {
+            total += parseInt(collectorTotalDaily[invoicesData[i].hari][key]);
+          })
+          collectorMonthlyTotal[invoicesData[i].kolektor.name] = parseInt(collectorMonthlyTotal[invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
+          _rows[invoicesData[i].hari] = {
+            "tgl": invoicesData[i].hari,
+            ...collectorTotalDaily[invoicesData[i].hari],
+            "total": total,
+            "aksi": "lihat detail",
+          }
         }
       }
       console.log(JSON.stringify(_rows));
