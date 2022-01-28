@@ -3,6 +3,7 @@ import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, Table
 import { db } from '../';
 import { collection, doc, getDocs, query, where } from 'firebase/firestore';
 import { invoicesData } from '../mock-data';
+import { formatRupiah } from '../rms-utility/rms-utility';
 
 /** this pages reporting transaction based on collectors who processed the payment */
 
@@ -125,7 +126,7 @@ function RMSCollectorReport() {
         collectorTotalDaily[i] = { ...collectorTotalObj }; /** init all dates , so after this process, this object will contain dates field, which each field is contain collectorTotalObj */
       }
       const collectorMonthlyTotal = { ...collectorTotalObj }; /** this holds per collector monthly total per month */
-      for (let i = 0; i < invoicesData.length; i++) {
+      for (let i = 0; i < invoicesData.length; i++) { /** iterate over invoice data to get all the needs */
         if (!isNaN(parseInt((invoicesData[i].biaya)))) {
           collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name] = parseInt(collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
           let total = 0;
@@ -133,10 +134,14 @@ function RMSCollectorReport() {
             total += parseInt(collectorTotalDaily[invoicesData[i].hari][key]);
           })
           collectorMonthlyTotal[invoicesData[i].kolektor.name] = parseInt(collectorMonthlyTotal[invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
+          const rupiahVersion = {};
+          Object.keys((collectorTotalDaily[invoicesData[i].hari])).forEach((key)=>{
+            rupiahVersion[key] = formatRupiah(collectorTotalDaily[invoicesData[i].hari][key])
+          })
           _rows[invoicesData[i].hari] = {
             "tgl": invoicesData[i].hari,
-            ...collectorTotalDaily[invoicesData[i].hari],
-            "total": total,
+            ...rupiahVersion,
+            "total": formatRupiah(total),
           }
         }
       }
@@ -150,10 +155,14 @@ function RMSCollectorReport() {
       Object.keys(collectorMonthlyTotal).forEach((key) => {
         grandTotal += collectorMonthlyTotal[key];
       })
+      /** format rupiah : collectorMonthlyTotal */
+      Object.keys(collectorMonthlyTotal).forEach((key) => {
+        collectorMonthlyTotal[key] = formatRupiah(collectorMonthlyTotal[key]);
+      })
       readyRows.push({
         "tgl": "Total",
         ...collectorMonthlyTotal,
-        "total": grandTotal,
+        "total": formatRupiah(grandTotal),
         "aksi": "-"
       });
       setRows(readyRows);

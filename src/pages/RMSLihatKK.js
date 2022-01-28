@@ -108,7 +108,7 @@ const RMSLihatKK = (props) => {
             }
             <Paper sx={{ marginBottom: "20px" }}>
                 <Box sx={{ padding: '10px' }}>
-                    <Typography variant={'subtitle2'}>Filter KK</Typography>
+                    <Typography variant={'subtitle2'}>Filter Rumah</Typography>
                 </Box>
                 <Divider />
                 <Box sx={{ padding: '10px' }}>
