@@ -117,23 +117,41 @@ function RMSCollectorReport() {
     try {
       /** { tgl: 1, kolektor1: 0, kolektor2: 0, kolektor3: 0, total: 0, aksi: "lihat detail" } */
       const _rows = {};
-      const obj = {};
+      const collectorTotalObj = {}; /** this is holder for collector achievement e.g : {"k1":10,"k2":20,"k3":30}  */
       collectorList.forEach((collector) => {
-        obj[collector] = 0;
+        collectorTotalObj[collector] = 0; /** at first we init each collector achievement to 0 */
       })
-      invoicesData.forEach((inv) => {
-        _rows[inv.hari] = {
-          "tgl": inv.hari,
-          ...obj,
-          "aksi": "lihat detail"
-        };
-        _rows[inv.hari][inv.kolektor.name] = parseInt(_rows[inv.hari][inv.kolektor.name]) + parseInt(inv.biaya);
-      })
+      const collectorTotalDaily = {}; /** this object hold daily collector;s achievement */
+      for (let i = 1; i <= 31; i++) {
+        collectorTotalDaily[i] = { ...collectorTotalObj }; /** init all dates , so after this process, this object will contain dates field, which each field is contain collectorTotalObj */
+      }
+      const collectorMonthlyTotal = { ...collectorTotalObj }; /** this holds per collector monthly total per month */
+      for (let i = 0; i < invoicesData.length; i++) {
+        collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name] = parseInt(collectorTotalDaily[invoicesData[i].hari][invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
+        let total = 0;
+        Object.keys(collectorTotalDaily[invoicesData[i].hari]).forEach((key) => {
+          total += parseInt(collectorTotalDaily[invoicesData[i].hari][key]);
+        })
+        collectorMonthlyTotal[invoicesData[i].kolektor.name] = parseInt(collectorMonthlyTotal[invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
+        _rows[invoicesData[i].hari] = {
+          "tgl": invoicesData[i].hari,
+          ...collectorTotalDaily[invoicesData[i].hari],
+          "total": total,
+          "aksi": "lihat detail",
+        }
+      }
       console.log(JSON.stringify(_rows));
+      console.log(JSON.stringify(collectorMonthlyTotal));
+      let readyRows = [];
+      Object.keys(_rows).forEach((key) => {
+        readyRows.push(_rows[key]);
+      })
+      setRows(readyRows);
     } catch (err) {
       console.log(err.message);
     }
   }
+
   return (
     <>
       <PageContent>
