@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Button } from '@mui/material';
+import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Button, TextField, Stack } from '@mui/material';
 import { db } from '../';
 import { collection, doc, getDocs, query, where } from 'firebase/firestore';
 import { invoicesData } from '../mock-data';
@@ -7,11 +7,14 @@ import { formatRupiah } from '../rms-utility/rms-utility';
 
 /** this pages reporting transaction based on collectors who processed the payment */
 
-const Filter = ({ showData }) => {
+const Filter = ({ showData, handleBulanChange, handleTahunChange }) => {
   return (
-    <Box sx={{ padding: '10px' }}>
-      <Typography vairant={'subtitle2'} >Filter</Typography>
-      <Button variant={'contained'} onClick={showData}>Tampilkan Data</Button>
+    <Box>
+      <Stack direction={'row'} spacing={1}>
+        <TextField type="number" label={"Bulan"} onChange={handleBulanChange} />
+        <TextField type="number" label={"Tahun"} onChange={handleTahunChange} />
+        <Button variant={'contained'} onClick={showData}>Tampilkan Data</Button>
+      </Stack>
     </Box>
   )
 }
@@ -51,9 +54,13 @@ const RMSBaseTable = ({ header, rows }) => {
 }
 
 const PageContent = ({ children }) => {
-  const [filter, table] = children;
+  const [title, filter, table] = children;
   return (
     <Paper>
+      {/** title */}
+      <Box sx={{ padding: '10px' }}>
+        {title}
+      </Box>
       {/** filter */}
       <Box sx={{ padding: '10px' }}>
         {filter}
@@ -114,6 +121,10 @@ function RMSCollectorReport() {
 
   /** get data */
   const getInvoiceData = async () => {
+    if (bulan === null || bulan === "" || tahun === null || tahun === "") {
+      alert('Mohon isi bulan dan tahun');
+      return;
+    }
     try {
       /** { tgl: 1, kolektor1: 0, kolektor2: 0, kolektor3: 0, total: 0, aksi: "lihat detail" } */
       const _rows = {};
@@ -135,7 +146,7 @@ function RMSCollectorReport() {
           })
           collectorMonthlyTotal[invoicesData[i].kolektor.name] = parseInt(collectorMonthlyTotal[invoicesData[i].kolektor.name]) + parseInt(invoicesData[i].biaya);
           const rupiahVersion = {};
-          Object.keys((collectorTotalDaily[invoicesData[i].hari])).forEach((key)=>{
+          Object.keys((collectorTotalDaily[invoicesData[i].hari])).forEach((key) => {
             rupiahVersion[key] = formatRupiah(collectorTotalDaily[invoicesData[i].hari][key])
           })
           _rows[invoicesData[i].hari] = {
@@ -174,7 +185,8 @@ function RMSCollectorReport() {
   return (
     <>
       <PageContent>
-        <Filter showData={getInvoiceData} />
+        <Typography variant='subtitle2'>Laporan IKK per kolektor bulan {bulan} tahun {tahun} </Typography>
+        <Filter showData={getInvoiceData} handleBulanChange={(e) => setBulan(e.target.value)} handleTahunChange={(e) => setTahun(e.target.value)} />
         <RMSBaseTable header={columnHeaderState} rows={rows} />
       </PageContent>
     </>
