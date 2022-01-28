@@ -103,7 +103,6 @@ function RMSCollectorReport() {
         setCollectorList(currentCollectorList);
         /** finally, add total as the last element of the columnHeader array */
         columnHeader.push('total');
-        columnHeader.push('aksi');
         setColumnHeaderState(columnHeader);
       } catch (err) {
         console.log(err.message);
@@ -138,7 +137,6 @@ function RMSCollectorReport() {
             "tgl": invoicesData[i].hari,
             ...collectorTotalDaily[invoicesData[i].hari],
             "total": total,
-            "aksi": "lihat detail",
           }
         }
       }
@@ -148,6 +146,16 @@ function RMSCollectorReport() {
       Object.keys(_rows).forEach((key) => {
         readyRows.push(_rows[key]);
       })
+      let grandTotal = 0;
+      Object.keys(collectorMonthlyTotal).forEach((key) => {
+        grandTotal += collectorMonthlyTotal[key];
+      })
+      readyRows.push({
+        "tgl": "Total",
+        ...collectorMonthlyTotal,
+        "total": grandTotal,
+        "aksi": "-"
+      });
       setRows(readyRows);
     } catch (err) {
       console.log(err.message);
