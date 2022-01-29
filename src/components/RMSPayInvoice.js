@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Stack, Box, Typography } from "@mui/material";
+import { Button, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Stack, Box, Typography, Select, MenuItem } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
@@ -11,6 +11,8 @@ import { useSelector } from "react-redux";
 import { createReport, createIkkReport, getSeparatedDate } from '../rms-utility/rms-utility';
 import RMSSnackbar from '../components/RMSSnackbar';
 import useSnackbar from '../hooks/useSnackbar';
+import { db } from '../';
+import { getDocs, collection, where, query } from 'firebase/firestore';
 
 const RMSPayInvoice = (props) => {
     //snackbar
@@ -45,6 +47,10 @@ const RMSPayInvoice = (props) => {
     const [ic_st_customBulan, ic_st_setCustomBulan] = useState(null);
     const [ic_st_customTahun, ic_st_setCustomTahun] = useState(null);
     const [ic_st_customDay, ic_st_setCustomDay] = useState(null);
+    /** collector list state */
+    const [collectorList, setCollectorList] = useState([]);
+    /** selected collector list state */
+    const [selectedCollector, setSelectedCollector] = useState(null);
     //functions
     const ic_sf_reset = () => {
         let namaDaftarTagihan = ``;
@@ -88,6 +94,26 @@ const RMSPayInvoice = (props) => {
             ic_st_setPembayaranSekarang(value);
         }
     }
+    useEffect(() => {
+        /** get collector list from db */
+        const getCollectorList = async () => {
+            try {
+                const ref = collection(db, 'user');
+                const conditions = [
+                    where('role', '==', 1)
+                ]
+                const collectorList = await getDocs(query(ref, ...conditions));
+                const fixCollectorLIst = [];
+                collectorList.forEach((doc) => {
+                    fixCollectorLIst.push(doc.data())
+                })
+                setCollectorList(fixCollectorLIst);
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+        getCollectorList();
+    }, [])
     //effects
     useEffect(() => {
         //populate edit inputs initial value
@@ -137,6 +163,22 @@ const RMSPayInvoice = (props) => {
                             value={ic_st_pembayaranSekarang}
                             type={'number'}
                             handleChange={(value) => handlePembayaranChange(value)} />
+                        <Divider />
+                        <Select onChange={(e) => {
+                            //filter a collector obj with selected id
+                            const _selectedCollectorObj = collectorList.filter((collector) => {
+                                return collector.uid === e.target.value
+                            })
+                            setSelectedCollector(_selectedCollectorObj[0]); //the filtered obj is an array so we have to add [0] to make user the supplied value is not an array.
+                        }}>
+                            {
+                                collectorList.map((collector) => {
+                                    return (
+                                        <MenuItem key={`kolektor-list-at-rmspayinvoice-${collector.uid}`} value={collector.uid} >{collector.name}</MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
                     </Stack>
                 </DialogContent>
                 <Divider />
@@ -145,6 +187,10 @@ const RMSPayInvoice = (props) => {
                         <Button startIcon={<RotateLeftIcon />} onClick={ic_sf_reset} variant="outlined" disabled={false}>Reset</Button>
                         <Button startIcon={<CancelIcon />} onClick={props.cancelEdit} variant="outlined" disabled={false}>Batal</Button>
                         <Button startIcon={<CheckIcon />} onClick={async () => {
+                            if (selectedCollector === null) {
+                                alert('Anda harus memilih kolektor untuk invoice ini.');
+                                return;
+                            }
                             const now = Date.now();
                             const separatedDate = getSeparatedDate(now);
                             await props.updateData(ic_st_id, 'invoice', {
@@ -153,8 +199,8 @@ const RMSPayInvoice = (props) => {
                                 'sisa': parseInt(ic_st_sisa),
                                 'tanggal-dibayar': Date.now(), /** later, never rely on this field, just stick with the separatedDate field on the document */
                                 'hari': ic_st_customDay === null ? separatedDate.day : ic_st_customDay,
-                                'bulan' : ic_st_customBulan === null ? separatedDate.month : ic_st_customBulan,
-                                'tahun' : ic_st_customTahun === null ? separatedDate.year : ic_st_customTahun,
+                                'bulan': ic_st_customBulan === null ? separatedDate.month : ic_st_customBulan,
+                                'tahun': ic_st_customTahun === null ? separatedDate.year : ic_st_customTahun,
                                 'kolektor': r_currentUser === null ? '-' : r_currentUser
                             });
                             try {
