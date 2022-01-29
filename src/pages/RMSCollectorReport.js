@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Button, TextField, Stack } from '@mui/material';
 import { db } from '../';
 import { collection, doc, getDocs, query, where } from 'firebase/firestore';
-import { invoicesData } from '../mock-data';
+//import { invoicesData } from '../mock-data';
 import { formatRupiah } from '../rms-utility/rms-utility';
 
 /** this pages reporting transaction based on collectors who processed the payment */
@@ -97,7 +97,7 @@ function RMSCollectorReport() {
     ]
     const getKolektorList = async () => {
       try {
-        /** temp aray for holding cuurent collecctor list from db */
+        /** temp aray for holding cuurent collector list from db */
         const currentCollectorList = [];
         const userCollection = await getDocs(query(userQuery, ...conditions));
         userCollection.forEach((doc) => {
@@ -127,6 +127,21 @@ function RMSCollectorReport() {
     }
     try {
       /** { tgl: 1, kolektor1: 0, kolektor2: 0, kolektor3: 0, total: 0, aksi: "lihat detail" } */
+      //get invoices data from the db
+      const ref = collection(db, `invoice`);
+      const conditions = [
+        where('bulan', '==', bulan),
+        where('tahun', '==', tahun),
+        where('status-invoce', '==', true)
+      ];
+      const invoicesDataRaw = await getDocs(query(ref, ...conditions));
+      const invoicesData = [];
+      invoicesDataRaw.forEach((doc)=>{
+        invoicesData.push({
+          "id" : doc.id,
+          ...doc.data()
+        })
+      });
       const _rows = {};
       const collectorTotalObj = {}; /** this is holder for collector achievement e.g : {"k1":10,"k2":20,"k3":30}  */
       collectorList.forEach((collector) => {

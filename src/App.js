@@ -215,7 +215,7 @@ function App() {
                             'status-invoice': true,
                             'hari' : separatedDate.day, //add day when the bill is paid
                           });
-                          h_sf_showSnackbar(`Tagihan ${inv['kategori']} untuk blok ${inv['blok']} no. ${inv['nomor-rumah']} telah LUNAS`, 'success')
+                          h_sf_showSnackbar(`Tagihan ${inv['kategori']} untuk blok ${inv['blok']} no. ${inv['nomor-rumah']} telah LUNAS`, 'success');
                           //reset states
                           ic_st_setKmActiveView('blok');
                           ic_st_kmSetSelectedBlok(null);
