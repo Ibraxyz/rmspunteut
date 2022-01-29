@@ -130,18 +130,19 @@ function RMSCollectorReport() {
       //get invoices data from the db
       const ref = collection(db, `invoice`);
       const conditions = [
-        where('bulan', '==', bulan),
-        where('tahun', '==', tahun),
+        where('bulan', '==', parseInt(bulan)),
+        where('tahun', '==', parseInt(tahun)),
         where('status-invoice', '==', true)
       ];
       const invoicesDataRaw = await getDocs(query(ref, ...conditions));
       const invoicesData = [];
-      invoicesDataRaw.forEach((doc)=>{
+      invoicesDataRaw.forEach((doc) => {
         invoicesData.push({
-          "id" : doc.id,
+          "id": doc.id,
           ...doc.data()
         })
       });
+      console.log(JSON.stringify(invoicesData))
       const _rows = {};
       const collectorTotalObj = {}; /** this is holder for collector achievement e.g : {"k1":10,"k2":20,"k3":30}  */
       collectorList.forEach((collector) => {
