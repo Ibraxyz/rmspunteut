@@ -201,7 +201,7 @@ const RMSPayInvoice = (props) => {
                                 'hari': ic_st_customDay === null ? separatedDate.day : ic_st_customDay,
                                 'bulan': ic_st_customBulan === null ? separatedDate.month : ic_st_customBulan,
                                 'tahun': ic_st_customTahun === null ? separatedDate.year : ic_st_customTahun,
-                                'kolektor': r_currentUser === null ? '-' : r_currentUser
+                                'kolektor':  selectedCollector,// this was => r_currentUser === null ? '-' : r_currentUser
                             });
                             try {
                                 //blok, category, nominal, currentUser
