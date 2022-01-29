@@ -75,7 +75,7 @@ const PageContent = ({ children }) => {
 }
 
 function RMSCollectorReport() {
-  /** table column header : tgl, kolektor1 , kolektor2, kolektor3, total  */
+  /** table column header : tgl, kolektor1 , kolektor2, kolektor3, ... ,total  */
   /** define current active filter */
   const [bulan, setBulan] = useState(null);
   const [tahun, setTahun] = useState(null);

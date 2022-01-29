@@ -202,6 +202,8 @@ function App() {
                       //update the invoice to be paid
                       try {
                         const updateInv = async () => {
+                          const _now = Date.now();
+                          const separatedDate = getSeparatedDate(_now);
                           await updateDoc(doc(db, "invoice", inv['id']), {
                             'blok': ic_st_kmSelectedBlok,
                             'nomor-rumah': ic_st_kmSelectedNomor,
@@ -211,6 +213,7 @@ function App() {
                             'tanggal-dibayar': Date.now(),
                             'kolektor': r_currentUser,
                             'status-invoice': true,
+                            'hari' : separatedDate.day, //add day when the bill is paid
                           });
                           h_sf_showSnackbar(`Tagihan ${inv['kategori']} untuk blok ${inv['blok']} no. ${inv['nomor-rumah']} telah LUNAS`, 'success')
                           //reset states
