@@ -132,7 +132,8 @@ function RMSCollectorReport() {
       const conditions = [
         where('bulan', '==', parseInt(bulan)),
         where('tahun', '==', parseInt(tahun)),
-        where('status-invoice', '==', true)
+        where('status-invoice', '==', true),
+        where('kategori', '==', 'bulanan')
       ];
       const invoicesDataRaw = await getDocs(query(ref, ...conditions));
       const invoicesData = [];

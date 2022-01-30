@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Stack, Box, Typography, Select, MenuItem } from "@mui/material";
+import { Button, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Stack, Box, Typography, Select, MenuItem, TextField } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
@@ -51,6 +51,7 @@ const RMSPayInvoice = (props) => {
     const [collectorList, setCollectorList] = useState([]);
     /** selected collector list state */
     const [selectedCollector, setSelectedCollector] = useState(null);
+    const [selectedDay, setSelectedDay] = useState(null);
     //functions
     const ic_sf_reset = () => {
         let namaDaftarTagihan = ``;
@@ -164,7 +165,7 @@ const RMSPayInvoice = (props) => {
                             type={'number'}
                             handleChange={(value) => handlePembayaranChange(value)} />
                         <Divider />
-                        <Select onChange={(e) => {
+                        <Select title={"Pilih Kolektor"} label={"Pilih Kolektor"} onChange={(e) => {
                             //filter a collector obj with selected id
                             const _selectedCollectorObj = collectorList.filter((collector) => {
                                 return collector.uid === e.target.value
@@ -179,6 +180,9 @@ const RMSPayInvoice = (props) => {
                                 })
                             }
                         </Select>
+                        <TextField type="number" title="Hari" label="hari" onChange={(e) => {
+                            setSelectedDay(e.target.value)
+                        }} />
                     </Stack>
                 </DialogContent>
                 <Divider />
@@ -190,6 +194,9 @@ const RMSPayInvoice = (props) => {
                             if (selectedCollector === null) {
                                 alert('Anda harus memilih kolektor untuk invoice ini.');
                                 return;
+                            } else if (selectedDay === null) {
+                                alert('Anda harus masukkan tanggal tagihan dibayar');
+                                return;
                             }
                             const now = Date.now();
                             const separatedDate = getSeparatedDate(now);
@@ -198,10 +205,10 @@ const RMSPayInvoice = (props) => {
                                 'status-invoice': ic_st_statusInvoice === 'BELUM LUNAS' ? false : true,
                                 'sisa': parseInt(ic_st_sisa),
                                 'tanggal-dibayar': Date.now(), /** later, never rely on this field, just stick with the separatedDate field on the document */
-                                'hari': ic_st_customDay === null ? separatedDate.day : ic_st_customDay,
+                                'hari': parseInt(selectedDay), //it was => ic_st_customDay === null ? separatedDate.day : ic_st_customDay
                                 'bulan': ic_st_customBulan === null ? separatedDate.month : ic_st_customBulan,
                                 'tahun': ic_st_customTahun === null ? separatedDate.year : ic_st_customTahun,
-                                'kolektor':  selectedCollector,// this was => r_currentUser === null ? '-' : r_currentUser
+                                'kolektor': selectedCollector,// this was => r_currentUser === null ? '-' : r_currentUser
                             });
                             try {
                                 //blok, category, nominal, currentUser
