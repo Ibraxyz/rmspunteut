@@ -12,10 +12,12 @@ const RMSRetribusiKendaraanReport = () => {
     const [header, setHeader] = useState([]);
     const [rows, setRows] = useState([]);
     const handleBulanChange = (e) => {
-        setBulan(e.target.value)
+        setBulan(e.target.value);
+        console.log(e.target.value);
     }
     const handleTahunChange = (e) => {
         setTahun(e.target.value)
+        console.log(e.target.value);
     }
     const showData = async () => {
         // rows => TGL TEAM I 5R 10R 15R TEAM II 5R 10R 15R TEAM III 5R 10R 15R TOTAL
@@ -28,11 +30,8 @@ const RMSRetribusiKendaraanReport = () => {
                 "total": 0,
             };
             const brk = await getDoc(doc(db, 'brk/brk1'));
-            console.log(JSON.stringify(brk.data()))
             const brkData = brk.data().biaya;
-            const biayaList = [];
             Object.keys(brkData).forEach((key) => {
-                biayaList.push(brkData[key]);
                 dailyReportDetail[brkData[key]] = 0;
             })
             const TEAM = [
@@ -57,19 +56,22 @@ const RMSRetribusiKendaraanReport = () => {
             for (let i = 1; i <= 31; i++) {
                 report[i] = { ...dailyReport }
             }
+            const reportString = JSON.stringify(report);
+            const parsedReport = JSON.parse(reportString);
             /** process the invoices **/
             const ref = collection(db, `invoice`);
             const conditions = [
-                where('bulan', '==', bulan),
-                where('tahun', '==', tahun),
+                where('bulan', '==', parseInt(bulan)),
+                where('tahun', '==', parseInt(tahun)),
                 where('kategori', '==', 'retribusi'),
             ]
-            const invoices = await getDocs(query(ref, ...conditions))
+            const invoices = await getDocs(query(ref, ...conditions));
             invoices.forEach((invoice) => {
-                report[invoice.hari][invoice.team.name][invoice.biaya] = parseInt(report[invoice.hari][invoice.team.name][invoice.biaya]) + 1;
-                report[invoice.hari][invoice.team.name]["total"] = parseInt(report[invoice.hari][invoice.team.name]["total"]) + parseInt(report[invoice.hari][invoice.team.name][invoice.biaya])
+                const invoiceData = invoice.data();
+                console.log('invoiceData.team.name', invoiceData.team.name);
+                parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya] = parseInt(parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya]) + 1;
             })
-            console.log(JSON.stringify(report));
+            console.log(JSON.stringify(parsedReport));
             /** construct final rows 
             const _rows = [];
             Object.keys(report).forEach((key) => {
