@@ -57,6 +57,7 @@ import { toDate } from 'date-fns';
 import md5 from 'md5';
 import RMSLihatKK from './pages/RMSLihatKK';
 import RMSCollectorReport from './pages/RMSCollectorReport';
+import RMSRetribusiKendaraanReport from './pages/RMSRetribusiKendaraanReport';
 
 export const light = {
   palette: {
@@ -213,7 +214,7 @@ function App() {
                             'tanggal-dibayar': Date.now(),
                             'kolektor': r_currentUser,
                             'status-invoice': true,
-                            'hari' : separatedDate.day, //add day when the bill is paid
+                            'hari': separatedDate.day, //add day when the bill is paid
                           });
                           h_sf_showSnackbar(`Tagihan ${inv['kategori']} untuk blok ${inv['blok']} no. ${inv['nomor-rumah']} telah LUNAS`, 'success');
                           //reset states
@@ -402,6 +403,9 @@ function App() {
                 </Route>
                 <Route path="/laporan-kolektor">
                   <RMSCollectorReport />
+                </Route>
+                <Route path="/laporan-kolektor-retribusi-kendaraan">
+                  <RMSRetribusiKendaraanReport />
                 </Route>
                 <Route path="/lihat-laporan">
                   <RMSReport />
