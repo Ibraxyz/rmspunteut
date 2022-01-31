@@ -5,20 +5,8 @@ import { collection, doc, getDocs, query, where } from 'firebase/firestore';
 //import { invoicesData } from '../mock-data';
 import { formatRupiah } from '../rms-utility/rms-utility';
 import RMSBaseTable from '../components/RMSBaseTable';
-
+import RMSMonthlyFilter from '../components/RMSMonthlyFilter';
 /** this pages reporting transaction based on collectors who processed the payment */
-
-const Filter = ({ showData, handleBulanChange, handleTahunChange }) => {
-  return (
-    <Box>
-      <Stack direction={'row'} spacing={1}>
-        <TextField type="number" label={"Bulan"} onChange={handleBulanChange} />
-        <TextField type="number" label={"Tahun"} onChange={handleTahunChange} />
-        <Button variant={'contained'} onClick={showData}>Tampilkan Data</Button>
-      </Stack>
-    </Box>
-  )
-}
 
 const PageContent = ({ children }) => {
   const [title, filter, table] = children;
@@ -170,7 +158,7 @@ function RMSCollectorReport() {
     <>
       <PageContent>
         <Typography variant='subtitle2'>Laporan IKK per kolektor bulan {bulan} tahun {tahun} </Typography>
-        <Filter showData={getInvoiceData} handleBulanChange={(e) => setBulan(e.target.value)} handleTahunChange={(e) => setTahun(e.target.value)} />
+        <RMSMonthlyFilter showData={getInvoiceData} handleBulanChange={(e) => setBulan(e.target.value)} handleTahunChange={(e) => setTahun(e.target.value)} />
         <RMSBaseTable header={columnHeaderState} rows={rows} />
       </PageContent>
     </>
