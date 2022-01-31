@@ -404,7 +404,7 @@ function App() {
                 <Route path="/laporan-kolektor">
                   <RMSCollectorReport />
                 </Route>
-                <Route path="/laporan-kolektor-retribusi-kendaraan">
+                <Route path="/laporan-kolektor-retribusi-kendaraan/">
                   <RMSRetribusiKendaraanReport />
                 </Route>
                 <Route path="/lihat-laporan">

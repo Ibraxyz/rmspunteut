@@ -53,7 +53,7 @@ const RMSPayInvoice = (props) => {
     const [selectedCollector, setSelectedCollector] = useState(null);
     const [selectedDay, setSelectedDay] = useState(null);
     /** invoice team */
-    const [selectedTeam,setSelectedTeam] = useState(0);
+    const [selectedTeam, setSelectedTeam] = useState(0);
     //functions
     const ic_sf_reset = () => {
         let namaDaftarTagihan = ``;
@@ -182,11 +182,20 @@ const RMSPayInvoice = (props) => {
                                 })
                             }
                         </Select>
+                        <Select title={"Pilih Team (Opsional)"} label={"Pilih Team (Opsional)"} onChange={(e) => {
+                            //filter a collector obj with selected id
+                            setSelectedTeam(e.target.value); //the filtered obj is an array so we have to add [0] to make user the supplied value is not an array.
+                        }}>
+                            {
+                                [{ "name": "TEAM_I", "value": 1 }, { "name": "TEAM_II", "value": 2 }, { "name": "TEAM_III", "value": 3 }].map((team) => {
+                                    return (
+                                        <MenuItem key={`kolektor-list-at-rmspayinvoice-${team.value}`} value={team.value} >{team.name}</MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
                         <TextField type="number" title="Hari" label="hari" onChange={(e) => {
                             setSelectedDay(e.target.value)
-                        }} />
-                        <TextField type="number" title="Team (Opsional)" label="Team (Opsional)" onChange={(e) => {
-                            setSelectedTeam(e.target.value)
                         }} />
                     </Stack>
                 </DialogContent>
@@ -214,7 +223,7 @@ const RMSPayInvoice = (props) => {
                                 'bulan': ic_st_customBulan === null ? separatedDate.month : ic_st_customBulan,
                                 'tahun': ic_st_customTahun === null ? separatedDate.year : ic_st_customTahun,
                                 'kolektor': selectedCollector,// this was => r_currentUser === null ? '-' : r_currentUser,
-                                'team' : selectedTeam,
+                                'team': selectedTeam,
                             });
                             try {
                                 //blok, category, nominal, currentUser

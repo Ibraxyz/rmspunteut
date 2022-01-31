@@ -334,33 +334,42 @@ const RMSBuatInvoiceUmum = (props) => {
     }
     //function - make invoice
     const makeInvoice = async () => {
-        //if address not exist , fail the ops
-        try {
-            const conditions = [
-                where('blok', '==', ic_st_blok),
-                where('no_rumah', '==', ic_st_no)
-            ];
-            const address = await getDocs(query(collection(db, `kk`), ...conditions));
-            let length = 0;
-            address.forEach((adr) => {
-                console.log('adr,no', JSON.stringify(adr.data()['no_rumah']))
-                length++;
-            })
-            if (length === 0) {
-                console.log('no docs');
-                h_sf_showSnackbar(`Data blok ${ic_st_blok} no. ${ic_st_no} belum ada di database, mohon periksa kembali...`, 'error');
-                return;
-            }
-        } catch (err) {
-            console.log(err.message);
-        }
         if (ic_st_category === null) {
             h_sf_showSnackbar('Kategori harus dipilih', 'error');
             return;
-        } else if (ic_st_blok === null && ic_st_no === null && ic_st_kepada === null) {
-            h_sf_showSnackbar('Mohon isi setidaknya satu diantara : kepada, blok, dan nomor rumah...', 'error')
+        }
+        //if address not exist , fail the ops
+        if (ic_st_category === 'bulanan') {
+            if (ic_st_blok === null && ic_st_no === null) {
+                h_sf_showSnackbar('Blok dan nomor rumah tidak boleh kosong', 'error')
+                return;
+            }
+            try {
+                const conditions = [
+                    where('blok', '==', ic_st_blok),
+                    where('no_rumah', '==', ic_st_no)
+                ];
+                const address = await getDocs(query(collection(db, `kk`), ...conditions));
+                let length = 0;
+                address.forEach((adr) => {
+                    console.log('adr,no', JSON.stringify(adr.data()['no_rumah']))
+                    length++;
+                })
+                if (length === 0) {
+                    console.log('no docs');
+                    h_sf_showSnackbar(`Data blok ${ic_st_blok} no. ${ic_st_no} belum ada di database, mohon periksa kembali...`, 'error');
+                    return;
+                }
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+
+        if (ic_st_invoiceList.length === 0) {
+            h_sf_showSnackbar('Mohon tambah setidaknya satu item', 'error');
             return;
         }
+
         ic_st_setIsLoading(true);
         const now = Date.now();
         const separatedDate = getSeparatedDate(now);
@@ -410,7 +419,7 @@ const RMSBuatInvoiceUmum = (props) => {
             let currentGeneratedID = [...ic_st_generatedInvoiceList];
             currentGeneratedID.push({
                 "id": docRef.id,
-                "link": 'https://localhost:3000'
+                "link": 'https://rmsapp-ffa22.web.app/invoice/' + docRef.id,
             })
             ic_st_setGeneratedInvoiceList(currentGeneratedID);
             h_sf_showSnackbar(`Invoice berhasi dibuat dengan ID Invoice ${docRef.id}`, 'success');
@@ -437,7 +446,7 @@ const RMSBuatInvoiceUmum = (props) => {
                 </Box>
                 <Divider />
                 <Box sx={{ padding: '10px' }}>
-                    <RMSTextField isError={false} isRequired={false} type={"text"} displayFilter={'default'} label={'Kepada'} helperText={'Masukkan Nama Tujuan Invoice'} value={ic_st_kepada} handleChange={(value) => { ic_st_setKepada(value); }} />
+                    {/** <RMSTextField isError={false} isRequired={false} type={"text"} displayFilter={'default'} label={'Kepada'} helperText={'Masukkan Nama Tujuan Invoice'} value={ic_st_kepada} handleChange={(value) => { ic_st_setKepada(value); }} /> */}
                     {/** <RMSSelect isError={false} isRequired={false} displayFilter={'default'} label={'Blok'} helperText={'Blok Rumah'} items={ic_st_blokItems} value={ic_st_blok} handleChange={(value) => { resetItemList(); ic_st_setBlok(value); ic_st_setActiveVariant(constructVariant(value)); }} /> */}
                     <RMSGroupedSelect
                         isError={false}
