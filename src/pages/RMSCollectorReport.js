@@ -6,28 +6,8 @@ import { collection, doc, getDocs, query, where } from 'firebase/firestore';
 import { formatRupiah } from '../rms-utility/rms-utility';
 import RMSBaseTable from '../components/RMSBaseTable';
 import RMSMonthlyFilter from '../components/RMSMonthlyFilter';
+import RMSTFDLayout from '../components/RMSTFDLayout';
 /** this pages reporting transaction based on collectors who processed the payment */
-
-const PageContent = ({ children }) => {
-  const [title, filter, table] = children;
-  return (
-    <Paper>
-      {/** title */}
-      <Box sx={{ padding: '10px' }}>
-        {title}
-      </Box>
-      {/** filter */}
-      <Box sx={{ padding: '10px' }}>
-        {filter}
-      </Box>
-      <Divider />
-      {/** table */}
-      <Box sx={{ padding: '10px' }}>
-        {table}
-      </Box>
-    </Paper>
-  )
-}
 
 function RMSCollectorReport() {
   /** table column header : tgl, kolektor1 , kolektor2, kolektor3, ... ,total  */
@@ -156,11 +136,11 @@ function RMSCollectorReport() {
 
   return (
     <>
-      <PageContent>
+      <RMSTFDLayout>
         <Typography variant='subtitle2'>Laporan IKK per kolektor bulan {bulan} tahun {tahun} </Typography>
         <RMSMonthlyFilter showData={getInvoiceData} handleBulanChange={(e) => setBulan(e.target.value)} handleTahunChange={(e) => setTahun(e.target.value)} />
         <RMSBaseTable header={columnHeaderState} rows={rows} />
-      </PageContent>
+      </RMSTFDLayout>
     </>
   );
 }
