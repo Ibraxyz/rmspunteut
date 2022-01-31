@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Divider, Stack, Box, Typography, Grid } from "@mui/material";
+import { Divider, Stack, Box, Typography, Grid, Container } from "@mui/material";
 //material ui
 import { Paper } from '@mui/material';
 import { formatRupiah } from '../rms-utility/rms-utility';
@@ -66,6 +66,7 @@ const RMSInvoiceDetail = forwardRef((props, ref) => {
     }
     return (
         <div ref={ref}>
+            <Container />
             {props.currentRow.length === 0 ? <Paper sx={{ display: props.isOpen ? 'default' : 'none', padding: '10px' }}>No Data Selected</Paper> :
                 <Paper sx={{ display: props.isOpen ? 'default' : 'none', padding: '10px' }}>
                     <Grid container sx={{ paddingBottom: '10px' }} spacing={1}>
@@ -137,6 +138,7 @@ const RMSInvoiceDetail = forwardRef((props, ref) => {
                     <Typography variant="caption" display={'block'} sx={{ opacity: 0.6, marginTop: '10px' }}>{`Invoice ini aktif mulai dari : ${props.currentRow[0]['tanggal-aktif']}`}</Typography>
                 </Paper>
             }
+            <Container />
         </div>
     )
 })
