@@ -52,6 +52,8 @@ const RMSPayInvoice = (props) => {
     /** selected collector list state */
     const [selectedCollector, setSelectedCollector] = useState(null);
     const [selectedDay, setSelectedDay] = useState(null);
+    /** invoice team */
+    const [selectedTeam,setSelectedTeam] = useState(0);
     //functions
     const ic_sf_reset = () => {
         let namaDaftarTagihan = ``;
@@ -183,6 +185,9 @@ const RMSPayInvoice = (props) => {
                         <TextField type="number" title="Hari" label="hari" onChange={(e) => {
                             setSelectedDay(e.target.value)
                         }} />
+                        <TextField type="number" title="Team (Opsional)" label="Team (Opsional)" onChange={(e) => {
+                            setSelectedTeam(e.target.value)
+                        }} />
                     </Stack>
                 </DialogContent>
                 <Divider />
@@ -208,7 +213,8 @@ const RMSPayInvoice = (props) => {
                                 'hari': parseInt(selectedDay), //it was => ic_st_customDay === null ? separatedDate.day : ic_st_customDay
                                 'bulan': ic_st_customBulan === null ? separatedDate.month : ic_st_customBulan,
                                 'tahun': ic_st_customTahun === null ? separatedDate.year : ic_st_customTahun,
-                                'kolektor': selectedCollector,// this was => r_currentUser === null ? '-' : r_currentUser
+                                'kolektor': selectedCollector,// this was => r_currentUser === null ? '-' : r_currentUser,
+                                'team' : selectedTeam,
                             });
                             try {
                                 //blok, category, nominal, currentUser

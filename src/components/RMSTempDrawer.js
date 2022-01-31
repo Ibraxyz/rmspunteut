@@ -118,22 +118,46 @@ function RMSTempDrawer(props) {
             <Divider />
             <List>
                 <Link to="/lihat-laporan/" style={{ textDecoration: "none", color: "initial" }}>
-                    <ListItem button key={"Lihat Laporan"}>
+                    <ListItem button key={"Laporan IKK per tahun"}>
                         <ListItemIcon>
                             <BarChartIcon />
                         </ListItemIcon>
-                        <ListItemText primary={"Lihat Laporan"} />
+                        <ListItemText primary={"Laporan IKK per tahun"} />
                     </ListItem>
                 </Link>
             </List>
             <Divider />
             <List>
                 <Link to="/laporan-kolektor/" style={{ textDecoration: "none", color: "initial" }}>
-                    <ListItem button key={"Laporan Kolektor"}>
+                    <ListItem button key={"Laporan Kolektor (IKK)"}>
                         <ListItemIcon>
                             <BarChartIcon />
                         </ListItemIcon>
-                        <ListItemText primary={"Laporan Kolektor"} />
+                        <ListItemText primary={"Laporan Kolektor (IKK)"} />
+                    </ListItem>
+                </Link>
+                <Link to="/laporan-kolektor-retribusi-kendaraan/" style={{ textDecoration: "none", color: "initial" }}>
+                    <ListItem button key={"Laporan Kolektor (Retribusi Kendaraan)"}>
+                        <ListItemIcon>
+                            <BarChartIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Laporan Kolektor (Retribusi Kendaraan)"} />
+                    </ListItem>
+                </Link>
+                <Link to="/laporan-kolektor-retribusi-lingkungan/" style={{ textDecoration: "none", color: "initial" }}>
+                    <ListItem button key={"Laporan Kolektor (Retribusi Lingkungan)"}>
+                        <ListItemIcon>
+                            <BarChartIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Laporan Kolektor (Retribusi Lingkungan)"} />
+                    </ListItem>
+                </Link>
+                <Link to="/laporan-kolektor-perawatan-lingkungan-dan-renovasi-rumah/" style={{ textDecoration: "none", color: "initial" }}>
+                    <ListItem button key={"Laporan Kolektor (Perawatan Lingkungan dan Renovasi Rumah)"}>
+                        <ListItemIcon>
+                            <BarChartIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Laporan Kolektor (Perawatan Lingkungan dan Renovasi Rumah)"} />
                     </ListItem>
                 </Link>
             </List>
