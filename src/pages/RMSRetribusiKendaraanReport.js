@@ -26,9 +26,7 @@ const RMSRetribusiKendaraanReport = () => {
             return;
         }
         try {
-            const dailyReportDetail = {
-                "total": 0,
-            };
+            const dailyReportDetail = {};
             const brk = await getDoc(doc(db, 'brk/brk1'));
             const brkData = brk.data().biaya;
             Object.keys(brkData).forEach((key) => {
@@ -48,6 +46,7 @@ const RMSRetribusiKendaraanReport = () => {
                     "value": 3,
                 }
             ]
+            dailyReportDetail["total"] = 0;
             const dailyReport = {}
             TEAM.forEach((team) => {
                 dailyReport[team.name] = { ...dailyReportDetail }
@@ -70,13 +69,49 @@ const RMSRetribusiKendaraanReport = () => {
                 const invoiceData = invoice.data();
                 console.log('invoiceData.team.name', invoiceData.team.name);
                 parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya] = parseInt(parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya]) + 1;
+                parsedReport[invoiceData.hari][invoiceData.team.name]["total"] = parseInt(parsedReport[invoiceData.hari][invoiceData.team.name]["total"]) + parseInt(invoiceData.biaya);
             })
-            console.log(JSON.stringify(parsedReport));
-            /** construct final rows 
+            //console.log(JSON.stringify(parsedReport));
+            /** construct final rows */
             const _rows = [];
-            Object.keys(report).forEach((key) => {
-                _rows.push();
-            }) */
+            Object.keys(parsedReport).forEach((key) => {
+                console.log(JSON.stringify(parsedReport[key]));
+                /**
+                 * {
+                    "TEAM_I": {
+                        "5000": 0,
+                        "15000": 0,
+                        "20000": 0,
+                        "30000": 0,
+                        "75000": 0,
+                        "135000": 0,
+                        "225000": 0,
+                        "total": 0
+                    },
+                    "TEAM_II": {
+                        "5000": 0,
+                        "15000": 0,
+                        "20000": 0,
+                        "30000": 0,
+                        "75000": 0,
+                        "135000": 0,
+                        "225000": 0,
+                        "total": 0
+                    },
+                    "TEAM_III": {
+                        "5000": 0,
+                        "15000": 0,
+                        "20000": 0,
+                        "30000": 0,
+                        "75000": 0,
+                        "135000": 0,
+                        "225000": 0,
+                        "total": 0
+                    }
+                }
+                 */
+                /** flatten the report[key] */
+            })
         } catch (err) {
             console.log(err.message);
         }
