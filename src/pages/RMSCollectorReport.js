@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Button, TextField, Stack } from '@mui/material';
+import { Box, Paper, Divider, Typography, Button, TextField, Stack } from '@mui/material';
 import { db } from '../';
 import { collection, doc, getDocs, query, where } from 'firebase/firestore';
 //import { invoicesData } from '../mock-data';
 import { formatRupiah } from '../rms-utility/rms-utility';
+import RMSBaseTable from '../components/RMSBaseTable';
 
 /** this pages reporting transaction based on collectors who processed the payment */
 
@@ -16,40 +17,6 @@ const Filter = ({ showData, handleBulanChange, handleTahunChange }) => {
         <Button variant={'contained'} onClick={showData}>Tampilkan Data</Button>
       </Stack>
     </Box>
-  )
-}
-/** total ikk kolektor1 tgl 1 bulan x tahun x */
-const RMSBaseTable = ({ header, rows }) => {
-  return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            {
-              header.map((h) => {
-                return <TableCell key={'tableCellHeader-' + h} align="right">{h}</TableCell>
-              })
-            }
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => {
-            return (
-              <TableRow
-                key={row.tgl + '-collectopReport'}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                {
-                  header.map((h) => {
-                    return (<TableCell key={h + 'tbody'} align="right">{row[h]}</TableCell>)
-                  })
-                }
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
   )
 }
 
