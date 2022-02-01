@@ -22,7 +22,7 @@ const RMSRetribusiKendaraanReport = () => {
     const showData = async () => {
         // rows => TGL TEAM I 5R 10R 15R TEAM II 5R 10R 15R TEAM III 5R 10R 15R TOTAL
         /** construct the header */
-        const _header = [];
+        const _header = ["TGL"];
         /** construct the rows */
         if (bulan === null || tahun === null) {
             alert('Bulan dan tahun harus diisi');
@@ -61,6 +61,7 @@ const RMSRetribusiKendaraanReport = () => {
                 })
                 _header.push(team.name);
             })
+            _header.push("TOTAL");
             const report = {};
             for (let i = 1; i <= 31; i++) {
                 report[i] = { ...dailyReport }
@@ -85,17 +86,42 @@ const RMSRetribusiKendaraanReport = () => {
             const _rows = [];
             Object.keys(parsedReport).forEach((key) => {
                 const flat = [];
+                flat.push(key); //day column value [TGL]
+                /** row total */
+                let rowTotal = 0;
                 Object.keys(parsedReport[key]).forEach((k) => {
                     Object.keys(parsedReport[key][k]).forEach((_k) => {
                         flat.push(parsedReport[key][k][_k]);
+                        if (_k === 'total') {
+                            rowTotal += parsedReport[key][k][_k];
+                        }
                     });
                 })
+                console.log('row total', rowTotal);
+                flat.push(rowTotal); //total in particular date
                 _rows.push(flat);
             })
             console.log(JSON.stringify(_header));
-            console.log(JSON.stringify(_rows));
-            setHeader(_header);
-            setRows(_rows);
+            /** remove all the thouzand decimal from nominal column name in the header */
+            const zeroFreeHeader = _header.map((_h) => {
+                let num = parseInt(_h)
+                if (!isNaN(num)) {
+                    num = num / 1000 + 'R';
+                    _h = num;
+                }
+                return _h;
+            })
+            setHeader(zeroFreeHeader);
+            /** remove all the zeros valued cell on rows */
+            const zeroFreeRows = _rows.map((row) => {
+                return row.map((r) => {
+                    if (r === 0) {
+                        r = "";
+                    }
+                    return r;
+                })
+            })
+            setRows(zeroFreeRows);
         } catch (err) {
             console.log(err.message);
         }
