@@ -1,5 +1,7 @@
 import React from 'react';
-import { Box, Paper, Divider, Typography, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Button, TextField, Stack } from '@mui/material';
+import { Paper, Table, TableContainer, TableRow, TableHead, TableCell, TableBody } from '@mui/material';
+
+/** this table component is used to display array of array (2 dimensional array) */
 
 const RMSFreeTable = ({ header, rows }) => {
     return (
@@ -18,10 +20,14 @@ const RMSFreeTable = ({ header, rows }) => {
                     {rows.map((row) => {
                         return (
                             <TableRow
-                                key={row.tgl + '-collectopReport'}
+                                key={row.tgl + '-collectorReportFreeTable'}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell key={h + 'tbodyrow'} align="right">{row}</TableCell>
+                                {
+                                    row.map((r) => {
+                                        return (<TableCell key={row + 'tbodyrow'} align="right">{r}</TableCell>)
+                                    })
+                                }
                             </TableRow>
                         )
                     })}

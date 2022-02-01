@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Typography } from '@mui/material';
 import RMSTFDLayout from '../components/RMSTFDLayout';
 import RMSMonthlyFilter from '../components/RMSMonthlyFilter';
-import RMSBaseTable from '../components/RMSBaseTable';
 import { db } from '../';
 import { where, doc, collection, getDocs, getDoc, query } from 'firebase/firestore';
+import RMSFreeTable from '../components/RMSFreeTable';
 
 const RMSRetribusiKendaraanReport = () => {
     const [bulan, setBulan] = useState(null);
@@ -120,7 +120,7 @@ const RMSRetribusiKendaraanReport = () => {
         <RMSTFDLayout>
             <Typography>Laporan Retribusi Kendaraan Bulan {bulan} Tahun {tahun} </Typography>
             <RMSMonthlyFilter handleBulanChange={handleBulanChange} handleTahunChange={handleTahunChange} showData={showData} />
-            <RMSBaseTable header={header} rows={rows} />
+            <RMSFreeTable header={header} rows={rows} />
         </RMSTFDLayout>
     )
 };
