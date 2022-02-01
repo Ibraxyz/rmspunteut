@@ -6,12 +6,12 @@ import { Paper, Table, TableContainer, TableRow, TableHead, TableCell, TableBody
 const RMSFreeTable = ({ header, rows }) => {
     return (
         <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 <TableHead>
                     <TableRow>
                         {
                             header.map((h) => {
-                                return <TableCell key={'tableCellHeader-' + h} align="right">{h}</TableCell>
+                                return <TableCell key={'tableCellHeader-' + h} align="center">{h}</TableCell>
                             })
                         }
                     </TableRow>
@@ -25,7 +25,7 @@ const RMSFreeTable = ({ header, rows }) => {
                             >
                                 {
                                     row.map((r) => {
-                                        return (<TableCell key={row + 'tbodyrow'} align="right">{r}</TableCell>)
+                                        return (<TableCell key={row + 'tbodyrow'} align="center">{r}</TableCell>)
                                     })
                                 }
                             </TableRow>
