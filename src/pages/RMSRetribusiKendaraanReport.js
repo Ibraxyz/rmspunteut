@@ -21,6 +21,9 @@ const RMSRetribusiKendaraanReport = () => {
     }
     const showData = async () => {
         // rows => TGL TEAM I 5R 10R 15R TEAM II 5R 10R 15R TEAM III 5R 10R 15R TOTAL
+        /** construct the grand total */
+        const grandTotal = {};
+        grandTotal["TGL"] = 0;
         /** construct the header */
         const _header = ["TGL"];
         /** construct the rows */
@@ -53,6 +56,10 @@ const RMSRetribusiKendaraanReport = () => {
             const dailyReport = {}
             TEAM.forEach((team) => {
                 dailyReport[team.name] = { ...dailyReportDetail }
+                /** grand total preps */
+                Object.keys(dailyReportDetail).forEach((dkey) => {
+                    grandTotal[`${team.name}_${dkey}`] = 0;
+                })
                 /** header */
                 Object.keys(dailyReportDetail).forEach((d) => {
                     if (d !== 'total') {
@@ -81,6 +88,7 @@ const RMSRetribusiKendaraanReport = () => {
                 parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya] = parseInt(parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya]) + 1;
                 parsedReport[invoiceData.hari][invoiceData.team.name]["total"] = parseInt(parsedReport[invoiceData.hari][invoiceData.team.name]["total"]) + parseInt(invoiceData.biaya);
             });
+            grandTotal["grandTotal"] = 0;
             //console.log(JSON.stringify(parsedReport));
             /** construct final rows */
             const _rows = [];
@@ -94,7 +102,10 @@ const RMSRetribusiKendaraanReport = () => {
                         flat.push(parsedReport[key][k][_k]);
                         if (_k === 'total') {
                             rowTotal += parsedReport[key][k][_k];
+                            grandTotal[`grandTotal`] += parsedReport[key][k][_k];
                         }
+                        /** grand total */
+                        grandTotal[`${k}_${[_k]}`] += parsedReport[key][k][_k];
                     });
                 })
                 console.log('row total', rowTotal);
@@ -102,7 +113,7 @@ const RMSRetribusiKendaraanReport = () => {
                 _rows.push(flat);
             })
             console.log(JSON.stringify(_header));
-            /** remove all the thouzand decimal from nominal column name in the header */
+            /** remove all the thouzand decimal from nominal column name in the header and replace with R*/
             const zeroFreeHeader = _header.map((_h) => {
                 let num = parseInt(_h)
                 if (!isNaN(num)) {
@@ -112,6 +123,7 @@ const RMSRetribusiKendaraanReport = () => {
                 return _h;
             })
             setHeader(zeroFreeHeader);
+            console.log('grand total', JSON.stringify(grandTotal));
             /** remove all the zeros valued cell on rows */
             const zeroFreeRows = _rows.map((row) => {
                 return row.map((r) => {
@@ -121,6 +133,13 @@ const RMSRetribusiKendaraanReport = () => {
                     return r;
                 })
             })
+            const flattedGrandTotal = [];
+            Object.keys(grandTotal).forEach((key) => {
+                flattedGrandTotal.push(grandTotal[key]);
+            })
+            /** replace zero element from flattened grand total with white space : this is used to avoid displaying zero at the bottom of TGL column */
+            flattedGrandTotal[0] = "";
+            zeroFreeRows.push(flattedGrandTotal);
             setRows(zeroFreeRows);
         } catch (err) {
             console.log(err.message);
