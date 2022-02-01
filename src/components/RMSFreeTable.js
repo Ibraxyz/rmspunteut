@@ -10,22 +10,22 @@ const RMSFreeTable = ({ header, rows }) => {
                 <TableHead>
                     <TableRow>
                         {
-                            header.map((h) => {
-                                return <TableCell key={'tableCellHeader-' + h} align="center">{h}</TableCell>
+                            header.map((h, index) => {
+                                return <TableCell key={'tableCellHeader-' + h + index * Math.random()} align="center">{h}</TableCell>
                             })
                         }
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => {
+                    {rows.map((row, index) => {
                         return (
                             <TableRow
-                                key={row.tgl + '-collectorReportFreeTable'}
+                                key={row.tgl + '-collectorReportFreeTable' + index * Math.random()}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 {
-                                    row.map((r) => {
-                                        return (<TableCell key={row + 'tbodyrow'} align="center">{r}</TableCell>)
+                                    row.map((r, idx) => {
+                                        return (<TableCell key={row + 'tbodyrow' + idx * Math.random()} align="center">{r}</TableCell>)
                                     })
                                 }
                             </TableRow>
