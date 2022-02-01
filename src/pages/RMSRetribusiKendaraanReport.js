@@ -5,6 +5,7 @@ import RMSMonthlyFilter from '../components/RMSMonthlyFilter';
 import { db } from '../';
 import { where, doc, collection, getDocs, getDoc, query } from 'firebase/firestore';
 import RMSFreeTable from '../components/RMSFreeTable';
+import { formatRupiah } from '../rms-utility/rms-utility';
 
 const RMSRetribusiKendaraanReport = () => {
     const [bulan, setBulan] = useState(null);
@@ -130,12 +131,12 @@ const RMSRetribusiKendaraanReport = () => {
                     if (r === 0) {
                         r = "";
                     }
-                    return r;
+                    return formatRupiah(r);
                 })
             })
             const flattedGrandTotal = [];
             Object.keys(grandTotal).forEach((key) => {
-                flattedGrandTotal.push(grandTotal[key]);
+                flattedGrandTotal.push(formatRupiah(grandTotal[key]));
             })
             /** replace zero element from flattened grand total with white space : this is used to avoid displaying zero at the bottom of TGL column */
             flattedGrandTotal[0] = "";
