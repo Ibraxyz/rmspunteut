@@ -319,7 +319,7 @@ const RMSLihatInvoice = () => {
     //redux path updater hooks
     const [r_currentPathState] = usePathUpdater('Lihat Invoice');
     const [currentScannedId, setCurrentScannedId] = useState(null);
-    const [isScannedIdDialogShown, setIsScannedIdDialogShown] = useState(true);
+    const [isScannedIdDialogShown, setIsScannedIdDialogShown] = useState(false);
     useEffect(() => {
         const unsub = onSnapshot(doc(db, `scannedId/${r_currentUser.uid}`), (doc) => {
             console.log("Current data: ", doc.data());
