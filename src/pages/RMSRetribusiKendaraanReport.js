@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography } from '@mui/material';
+import { Box, Paper, Typography, Divider } from '@mui/material';
 import RMSTFDLayout from '../components/RMSTFDLayout';
 import RMSMonthlyFilter from '../components/RMSMonthlyFilter';
 import { db } from '../';
@@ -12,6 +12,8 @@ const RMSRetribusiKendaraanReport = () => {
     const [tahun, setTahun] = useState(null);
     const [header, setHeader] = useState([]);
     const [rows, setRows] = useState([]);
+    const [teamFeeRows, setTeamFeeRows] = useState([]);
+    const [nominalTotalRows, setNominalTotalRows] = useState([]);
     const handleBulanChange = (e) => {
         setBulan(e.target.value);
         console.log(e.target.value);
@@ -22,6 +24,8 @@ const RMSRetribusiKendaraanReport = () => {
     }
     const showData = async () => {
         // rows => TGL TEAM I 5R 10R 15R TEAM II 5R 10R 15R TEAM III 5R 10R 15R TOTAL
+        /** construct nominal total */
+        const _nominalTotal = {};
         /** construct the grand total */
         const grandTotal = {};
         grandTotal["TGL"] = 0;
@@ -38,6 +42,7 @@ const RMSRetribusiKendaraanReport = () => {
             const brkData = brk.data().biaya;
             Object.keys(brkData).forEach((key) => {
                 dailyReportDetail[brkData[key]] = 0;
+                _nominalTotal[brkData[key]] = 0; /** nominal total rows */
             })
             const TEAM = [
                 {
@@ -88,6 +93,7 @@ const RMSRetribusiKendaraanReport = () => {
                 const invoiceData = invoice.data();
                 parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya] = parseInt(parsedReport[invoiceData.hari][invoiceData.team.name][invoiceData.biaya]) + 1;
                 parsedReport[invoiceData.hari][invoiceData.team.name]["total"] = parseInt(parsedReport[invoiceData.hari][invoiceData.team.name]["total"]) + parseInt(invoiceData.biaya);
+                _nominalTotal[invoiceData.biaya] += 1;
             });
             grandTotal["grandTotal"] = 0;
             //console.log(JSON.stringify(parsedReport));
@@ -138,20 +144,73 @@ const RMSRetribusiKendaraanReport = () => {
             Object.keys(grandTotal).forEach((key) => {
                 flattedGrandTotal.push(formatRupiah(grandTotal[key]));
             })
-            /** replace zero element from flattened grand total with white space : this is used to avoid displaying zero at the bottom of TGL column */
+            /** replace all the zero elements from flattened grand total with white spaces : this is used to avoid displaying zero at the bottom of the table (TGL column) */
             flattedGrandTotal[0] = "";
             zeroFreeRows.push(flattedGrandTotal);
             setRows(zeroFreeRows);
+            /** construct the team fee */
+            const _totalFeeRows = {};
+            let totalTFR = 0;
+            TEAM.forEach((t) => {
+                console.log('vinspect', grandTotal[`${t.name}_total`]);
+                totalTFR += grandTotal[`${t.name}_total`] / 10;
+                _totalFeeRows[`${t.name}`] = formatRupiah(grandTotal[`${t.name}_total`] / 10);
+            });
+            console.log(JSON.stringify(_totalFeeRows));
+            const totalFeeRowsArr = [];
+            Object.keys(_totalFeeRows).forEach((key) => {
+                totalFeeRowsArr.push([key, _totalFeeRows[key]]);
+            })
+            /** add total to team fee rows */
+            totalFeeRowsArr.push(["TOTAL", formatRupiah(totalTFR)])
+            setTeamFeeRows(totalFeeRowsArr);
+            console.log(JSON.stringify(_nominalTotal));
+            /** convert _nominalTotal Object into a 2D Array */
+            const nominalTotalArr = [];
+            let totalTransactions = 0;
+            Object.keys(_nominalTotal).forEach((key) => {
+                nominalTotalArr.push([key, _nominalTotal[key]]);
+                totalTransactions += _nominalTotal[key];
+            })
+            /** add total to nominalTotalArr */
+            nominalTotalArr.push(["TOTAL", totalTransactions])
+            setNominalTotalRows(nominalTotalArr);
         } catch (err) {
             console.log(err.message);
         }
     }
     return (
-        <RMSTFDLayout>
-            <Typography>Laporan Retribusi Kendaraan Bulan {bulan} Tahun {tahun} </Typography>
-            <RMSMonthlyFilter handleBulanChange={handleBulanChange} handleTahunChange={handleTahunChange} showData={showData} />
-            <RMSFreeTable header={header} rows={rows} />
-        </RMSTFDLayout>
+        <>
+            <div style={{ marginBottom: '20px' }}>
+                <RMSTFDLayout>
+                    <Typography>Laporan Retribusi Kendaraan Bulan {bulan} Tahun {tahun} </Typography>
+                    <RMSMonthlyFilter handleBulanChange={handleBulanChange} handleTahunChange={handleTahunChange} showData={showData} />
+                    <RMSFreeTable header={header} rows={rows} />
+                </RMSTFDLayout>
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+                <Paper>
+                    <Box sx={{ padding: '10px' }}>
+                        <Typography>Fee Retribusi Kendaraan 10% bulan {bulan} Tahun {tahun} </Typography>
+                    </Box>
+                    <Divider />
+                    <Box sx={{ padding: '10px' }}>
+                        <RMSFreeTable header={["TEAM", "JUMLAH"]} rows={teamFeeRows} />
+                    </Box>
+                </Paper>
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+                <Paper>
+                    <Box sx={{ padding: '10px' }}>
+                        <Typography>Jumlah Transaksi Bulan {bulan} Tahun {tahun} </Typography>
+                    </Box>
+                    <Divider />
+                    <Box sx={{ padding: '10px' }}>
+                        <RMSFreeTable header={["Nominal", "JUMLAH"]} rows={nominalTotalRows} />
+                    </Box>
+                </Paper>
+            </div>
+        </>
     )
 };
 
