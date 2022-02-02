@@ -7,7 +7,7 @@ import { getTime } from 'date-fns';
 import useViewData from "../hooks/useViewData";
 import usePathUpdater from "../hooks/usePathUpdater";
 //material ui
-import { LinearProgress, Snackbar, Alert, Box, Grid, Dialog, DialogActions, Divider, Stack, DialogTitle, DialogContent, Button } from '@mui/material';
+import { LinearProgress, Snackbar, Alert, Box, Grid, Dialog, Paper, DialogActions, Divider, Stack, DialogTitle, DialogContent, Button } from '@mui/material';
 import RMSInvoiceDetail from "../components/RMSInvoiceDetail";
 import RMSPayInvoice from "../components/RMSPayInvoice";
 //material icons
@@ -19,17 +19,18 @@ import { useReactToPrint } from 'react-to-print';
 import QRCode from "react-qr-code";
 import { defineMonthName, getSeparatedDate, substractIkkReport, substractReport, createReportFromInvoices } from "../rms-utility/rms-utility";
 //react router dom
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 //rms
 import RMSTextField from "../components/RMSTextField";
 import { db } from '../index';
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc, onSnapshot } from 'firebase/firestore';
 //redux
 import { useSelector } from "react-redux";
 //utility
 import useBloks from "../hooks/useBloks";
 import RMSFullScreenDialog from "../components/RMSFullScreenDialog";
 import RMSDisplayTable from "../components/RMSDisplayTable";
+
 
 //inner component
 const TopPrintPreview = (props) => {
@@ -317,9 +318,49 @@ const RMSLihatInvoice = () => {
     ] = useViewData(ic_st_filterOptionsList, ic_st_setFilterOptionsList, 'invoice');
     //redux path updater hooks
     const [r_currentPathState] = usePathUpdater('Lihat Invoice');
+    const [currentScannedId, setCurrentScannedId] = useState(null);
+    const [isScannedIdDialogShown, setIsScannedIdDialogShown] = useState(true);
+    useEffect(() => {
+        const unsub = onSnapshot(doc(db, `scannedId/${r_currentUser.uid}`), (doc) => {
+            console.log("Current data: ", doc.data());
+            setIsScannedIdDialogShown(true);
+            setCurrentScannedId(doc.data())
+        });
+    }, [])
     //-----------------------------------------------------------------------------------------------------------//
     return (
         <div>
+            {/** scanned id component */}
+            {
+                isScannedIdDialogShown ?
+                    <div style={{
+                        background: 'rgba(0,0,0,0.6)',
+                        width: '100%',
+                        height: '100vh',
+                        top: 0,
+                        left: 0,
+                        zIndex: 10000,
+                        position: 'fixed',
+                        boxSizing: 'border-box',
+                        padding: '20px',
+                    }}>
+                        <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <Paper sx={{ display: 'inline-block' }}>
+                                <Box sx={{ padding: '10px' }}>
+                                    <Link to={`/lihat-invoice/`} style={{ textDecoration: "none" }}>
+                                        Lihat Invoice {currentScannedId}
+                                    </Link>
+                                </Box>
+                                <Divider />
+                                <Box sx={{ padding: '10px' }}>
+                                    <Button variant={'contained'} onClick={() => setIsScannedIdDialogShown(false)} >Batal</Button>
+                                </Box>
+                            </Paper>
+                        </div>
+                    </div>
+                    :
+                    <div></div>
+            }
             {/** filter component */}
             <RMSFilter
                 options={ic_st_filterOptionsList}
