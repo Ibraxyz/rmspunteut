@@ -10,7 +10,7 @@ import RMSLineChart from "../components/RMSLineChart";
 import { db } from '../index';
 
 //firebase 
-import { collection, doc, addDoc, getDocs, deleteDoc, query, where, updateDoc, getDoc } from "firebase/firestore";
+import { collection, doc, addDoc, getDocs, deleteDoc, query, where, updateDoc, getDoc, setDoc } from "firebase/firestore";
 
 //qr scanner
 import { QrReader } from '@blackbox-vision/react-qr-reader';
@@ -239,7 +239,6 @@ const Beranda = () => {
                     </Paper>
                 </Grid>
             </Grid>
-            {/* QR
             <Paper sx={{ padding: '10px', marginBottom: '15px', textAlign: 'right' }}>
                 <LinearProgress color="secondary" sx={{ display: ic_st_isProcessing ? 'default' : 'none' }} />
                 <Button variant='contained' onClick={() => ic_st_setIsQRShown(!ic_st_isQRShown)}>{ic_st_isQRShown ? 'Close QR Scanner' : 'Scan QR Code'}</Button>
@@ -256,19 +255,20 @@ const Beranda = () => {
                         /> : <div></div>
                 }
                 {
-                    ic_st_isQRShown && data != null && data != undefined ? <Box><Button onClick={data['sisa'] > 0 ? () => ic_af_updateData(data['id'], 'invoice', {
-                        'sudah-dibayar': data['sisa'] + data['sudah-dibayar'],
-                        'sisa': 0,
-                        'status-invoice': true,
-                        'tanggal-dibayar': Date.now()
-                    }) : () => {
-                        ic_st_setAlertMessage('Tagihan yang sudah lunas tidak dapat dibayar lagi.');
-                        ic_st_setMsgSeverity('error');
-                        ic_st_setIsSnackbarShown(true);
-                    }} variant={'contained'} disabled={data['sisa'] === 0 || ic_st_isProcessing ? true : false} sx={{ marginTop: '10px', width: '100%' }}>{`Bayar tagihan ${data['blok']}${data['nomor-rumah']}`}</Button></Box> : <></>
+                    ic_st_isQRShown && data != null && data != undefined ? <Box><Button onClick={
+                        async () => {
+                            //update current collector's scanned id
+                            try {
+                                await setDoc(doc(db, `scannedId/${r_currentUser.uid}`), data['id']);
+                                ic_st_setIsProcessing(false);
+                            } catch (err) {
+                                alert(err.message);
+                                ic_st_setIsProcessing(false);
+                            }
+                        }
+                    } variant={'contained'} disabled={data['sisa'] === 0 || ic_st_isProcessing ? true : false} sx={{ marginTop: '10px', width: '100%' }}>{`Lihat Invoice`}</Button></Box> : <></>
                 }
             </Paper>
-            */}
             {/** snack bar */}
             <Snackbar open={ic_st_isSnackbarShown} autoHideDuration={2000} onClose={() => { ic_st_setIsSnackbarShown(false) }}>
                 <Alert onClose={() => { ic_st_setIsSnackbarShown(false) }} severity={ic_st_msgSeverity} sx={{ width: '100%' }}>
