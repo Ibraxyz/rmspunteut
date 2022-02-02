@@ -239,7 +239,7 @@ const Beranda = () => {
                     </Paper>
                 </Grid>
             </Grid>
-            <Paper sx={{ padding: '10px', marginBottom: '15px', textAlign: 'right' }}>
+            <Paper sx={{ padding: '10px', marginBottom: '15px', marginTop: '15px', textAlign: 'right' }}>
                 <LinearProgress color="secondary" sx={{ display: ic_st_isProcessing ? 'default' : 'none' }} />
                 <Button variant='contained' onClick={() => ic_st_setIsQRShown(!ic_st_isQRShown)}>{ic_st_isQRShown ? 'Close QR Scanner' : 'Scan QR Code'}</Button>
                 {
