@@ -259,7 +259,7 @@ const Beranda = () => {
                         async () => {
                             //update current collector's scanned id
                             try {
-                                await setDoc(doc(db, `scannedId/${r_currentUser.uid}`), data['id']);
+                                await setDoc(doc(db, `scannedId/${r_currentUser.uid}`), { "id": data['id'] });
                                 ic_st_setIsProcessing(false);
                             } catch (err) {
                                 alert(err.message);
