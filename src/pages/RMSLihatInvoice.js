@@ -323,10 +323,10 @@ const RMSLihatInvoice = () => {
     useEffect(() => {
         const unsub = onSnapshot(doc(db, `scannedId/${r_currentUser.uid}`), (doc) => {
             if (currentScannedId !== null) {
-                console.log("Current data: ", doc.data());
+                console.log("Current data: ", doc.data().id);
                 setIsScannedIdDialogShown(true);
             }
-            setCurrentScannedId(doc.data())
+            setCurrentScannedId(doc.data().id)
         });
     }, [])
     //-----------------------------------------------------------------------------------------------------------//
