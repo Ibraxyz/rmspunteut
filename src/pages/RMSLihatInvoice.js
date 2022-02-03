@@ -328,12 +328,23 @@ const RMSLihatInvoice = () => {
 
             } else {
                 //alert("Current data: ", JSON.stringify(doc.data()));
-                setIsScannedIdDialogShown(true);
-                setCurrentScannedId(doc.data().id)
+                if (doc.data().id !== "inactive") {
+                    setIsScannedIdDialogShown(true);
+                    setCurrentScannedId(doc.data().id)
+                }
             }
 
 
         });
+        const deactivateId = async () => {
+            try {
+                await setDoc(doc(db, `scannedId/${r_currentUser.uid}`), { "id": "inactive" });
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+
+        return () => deactivateId(); //clean up
     }, [])
     //-----------------------------------------------------------------------------------------------------------//
     return (
@@ -361,7 +372,7 @@ const RMSLihatInvoice = () => {
                                 </Box>
                                 <Divider />
                                 <Box sx={{ padding: '10px' }}>
-                                    <Button variant={'contained'} onClick={() => setIsScannedIdDialogShown(false)} >Batal</Button>
+                                    <Button variant={'contained'} onClick={() => setIsScannedIdDialogShown(false)} >Tutup</Button>
                                 </Box>
                             </Paper>
                         </div>
