@@ -327,7 +327,7 @@ const RMSLihatInvoice = () => {
             if (doc.data() === null || doc.data() === undefined) {
 
             } else {
-                alert("Current data: ", JSON.stringify(doc.data()));
+                //alert("Current data: ", JSON.stringify(doc.data()));
                 setIsScannedIdDialogShown(true);
                 setCurrentScannedId(doc.data().id)
             }
@@ -355,7 +355,7 @@ const RMSLihatInvoice = () => {
                         <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             <Paper sx={{ display: 'inline-block' }}>
                                 <Box sx={{ padding: '10px' }}>
-                                    <Link to={`/lihat-invoice/`} style={{ textDecoration: "none" }}>
+                                    <Link to={`/lihat-invoice/${currentScannedId}`} style={{ textDecoration: "none" }}>
                                         Lihat Invoice {currentScannedId}
                                     </Link>
                                 </Box>
