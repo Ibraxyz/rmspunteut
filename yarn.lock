@@ -12240,6 +12240,11 @@
   "resolved" "https://registry.npmjs.org/text-table/-/text-table-0.2.0.tgz"
   "version" "0.2.0"
 
+"thermal-printer-cordova-plugin@^1.0.6":
+  "integrity" "sha512-7N/mBp6morPzMcQqbHsG7SeoQfZWJHL5RbtfLgj1EZ9+Kn0N+t5uyuAXitWL+SkdzcjonQpnR02pcklXoupZ3w=="
+  "resolved" "https://registry.npmjs.org/thermal-printer-cordova-plugin/-/thermal-printer-cordova-plugin-1.0.6.tgz"
+  "version" "1.0.6"
+
 "three@^0.134.0", "three@>=0.126":
   "integrity" "sha512-LbBerg7GaSPjYtTOnu41AMp7tV6efUNR3p4Wk5NzkSsNTBuA5mDGOfwwZL1jhhVMLx9V20HolIUo0+U3AXehbg=="
   "resolved" "https://registry.npmjs.org/three/-/three-0.134.0.tgz"

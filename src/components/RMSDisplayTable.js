@@ -123,7 +123,7 @@ export default function RMSDisplayTable(props) {
 
                         </TableCell>
                         <TableCell >
-                            <Typography variant={'subtitle2'}>Total Biaya</Typography>
+                            <Typography variant={'subtitle2'}>Total Pendapatan</Typography>
                         </TableCell>
                         <TableCell align="left">
                             <Typography variant={'subtitle2'}>{`Rp.${formatRupiah(totalBL + total)}`}</Typography>

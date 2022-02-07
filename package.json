@@ -40,6 +40,7 @@
     "react-to-print": "^2.14.0",
     "redux": "^4.1.1",
     "redux-thunk": "^2.4.0",
+    "thermal-printer-cordova-plugin": "^1.0.6",
     "three": "^0.134.0",
     "web-vitals": "^1.0.1"
   },
