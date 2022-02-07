@@ -58,6 +58,7 @@ import md5 from 'md5';
 import RMSLihatKK from './pages/RMSLihatKK';
 import RMSCollectorReport from './pages/RMSCollectorReport';
 import RMSRetribusiKendaraanReport from './pages/RMSRetribusiKendaraanReport';
+import RMSBayarCepat from './pages/RMSBayarCepat';
 
 export const light = {
   palette: {
@@ -384,6 +385,9 @@ function App() {
                 </Route>
                 <Route path="/buat-invoice">
                   <RMSMakeInvoice />
+                </Route>
+                <Route path="/bayar-cepat">
+                  <RMSBayarCepat />
                 </Route>
                 <Route path="/buat-invoice-umum">
                   <RMSBuatInvoiceUmum />
@@ -778,7 +782,6 @@ function App() {
                       ic_st_setIsKMCompleteDialogShown(false);//close dialog
                     }
                   }
-
                   finishProcess();
                 }}>Kirim ke WA</Button>
                 {/** </a> */}
