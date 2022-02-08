@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: App.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: App.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import './App.css';
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
+import React, { useEffect, useState, useRef } from "react";
+import PrimarySearchAppBar from "./components/PrimarySearchAppBar";
+import LihatTagihan from './pages/LihatTagihan';
+import RMSBreadCrumbs from "./components/RMSBreadCrumbs";
+import { Container, Snackbar, Skeleton, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
+import RMSTempDrawer from "./components/RMSTempDrawer";
+import BuatTagihan from "./pages/BuatTagihan";
+import Beranda from "./pages/Beranda";
+import CetakKuitansi from "./pages/CetakKuitansi";
+import LihatKK from "./pages/LihatKK";
+import InputKK from "./pages/InputKK";
+import InputBiaya from "./pages/InputBiaya";
+import RMSSignUp from './pages/RMSSignUp';
+import RMSCheckData from './pages/RMSCheckData';
+//redux
+import { useSelector, useDispatch } from "react-redux";
+import { bindActionCreators } from 'redux';
+import { actionCreators } from "./state/index";
+//firebase auth
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth"
+//firebase firestore
+import { doc, getDoc, query, collection, where, getDocs, updateDoc, orderBy } from "firebase/firestore";
+//db
+import { db } from "./index";
+//material ui
+import { Paper, LinearProgress, Typography, Button, Box, Divider, Grid, Stack } from '@mui/material';
+//rms
+import RMSSnackbar from './components/RMSSnackbar';
+//utililty
+import { defineMonthName, formatRupiah, getSeparatedDate, createReport, createIkkReport, getWhatsappLink } from './rms-utility/rms-utility';
+//hooks
+import useSnackbar from './hooks/useSnackbar';
+//icons
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+//html to canvas
+import html2canvas from 'html2canvas';
+
+import {
+  BrowserRouter as Router,
+  Route
+} from "react-router-dom";
+import LihatBiaya from './pages/LihatBiaya';
+import RMSLihatInvoice from './pages/RMSLihatInvoice';
+import RMSMakeInvoice from './pages/RMSMakeInvoice';
+import RMSManageUser from './pages/RMSManageUser';
+import { breakpoints } from '@mui/system';
+import RMSPengaturanBiaya from './pages/RMSPengaturanBiaya';
+import RMSBuatInvoiceUmum from './pages/RMSBuatInvoiceUmum';
+import RMSReport from './pages/RMSReport';
+import useBlok from './hooks/useBloks';
+import useGroupedSelect from './hooks/useGroupedSelect';
+import RMSInvoiceDetail from './components/RMSInvoiceDetail';
+import QRCode from 'react-qr-code';
+import { toDate } from 'date-fns';
+import md5 from 'md5';
+import RMSLihatKK from './pages/RMSLihatKK';
+import RMSCollectorReport from './pages/RMSCollectorReport';
+import RMSRetribusiKendaraanReport from './pages/RMSRetribusiKendaraanReport';
+import RMSBayarCepat from './pages/RMSBayarCepat';
+
+export const light = {
+  palette: {
+    type: 'light',
+  },
+}
+export const dark = {
+  palette: {
+    type: 'dark',
+  },
+}
+
+function App() {
+  const storage = getStorage();
+  //ref to generated invoice image
+  const invoiceImgRef = useRef();
+  //use block hook
+  //const [ic_st_blokItems] = useBlok();
+  const [ic_st_blokItems, ic_st_setBlokItems] = useState([]);
+  const [ic_st_an, ic_st_aazz, ic_st_tasbiII] = useGroupedSelect();
+  const [cache_blok, set_cache_blok] = useState({}); //caching blok no rumah for 'hemat quota'
+  //refresh blok no rumah list
+  const refreshBlokList = async () => {
+    //get latest update from db
+  }
+  //effect
+  useEffect(() => {
+    const blocks = [];
+    ic_st_an.forEach((an) => {
+      console.log(JSON.stringify(an));
+      blocks.push(an);
+    })
+    ic_st_aazz.forEach((aazz) => {
+      console.log(JSON.stringify(aazz));
+      blocks.push(aazz);
+    })
+    ic_st_tasbiII.forEach((tasbi2) => {
+      console.log(JSON.stringify(tasbi2));
+      blocks.push(tasbi2);
+    })
+    ic_st_setBlokItems(blocks);
+  }, [ic_st_an, ic_st_aazz, ic_st_tasbiII])
+  //redux 
+  const dispatch = useDispatch();
+  const { updateCurrentLoginStatus, updateCurrentUser } = bindActionCreators(actionCreators, dispatch);
+  const r_currentPathState = useSelector((state) => state.currentPath);
+  const r_currentLoginStatus = useSelector((state) => state.currentLoginStatus);
+  const r_currentUser = useSelector((state) => state.currentUser);
+  //state
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState();
+  const [ic_st_user, ic_st_setUser] = useState(null);
+  const [ic_st_kmActiveView, ic_st_setKmActiveView] = useState('blok');
+  const [ic_st_kmSelectedBlok, ic_st_kmSetSelectedBlok] = useState(null);
+  const [ic_st_kmSelectedNomor, ic_st_kmSetSelectedNomor] = useState(null);
+  const [ic_st_kmSelectedBulan, ic_st_kmSetSelectedBulan] = useState(null);
+  const [ic_st_kmSelectedTahun, ic_st_kmSetSelectedTahun] = useState(null);
+  //ops state
+  const [ic_st_numberListOpsView, ic_st_setNumberListOpsView] = useState([]);
+  const [ic_st_nomList, ic_st_setNomList] = useState([]);
+  const [ic_st_kmNomIsLoading, ic_st_setKmNomIsLoading] = useState(false);
+  const [ic_st_isKMCompleteDialogShown, ic_st_setIsKMCompleteDialogShown] = useState(false);
+  const [ic_st_kmCurrentPaidInv, ic_st_setKmCurrentPaidInv] = useState([]);
+  const [ic_st_waNumberFix, ic_st_setWaNUmberFIx] = useState(0);
+  //snackbar
+  const [h_st_isSnackbarShown, h_st_message, h_st_severity, h_sf_showSnackbar, h_sf_closeSnackbar] = useSnackbar();
+  //firebase auth
+  const auth = getAuth();
+  //handle logout operation
+  const handleLogout = () => {
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      console.log('user is signed out');
+      updateCurrentLoginStatus(false);
+    }).catch((error) => {
+      // An error happened.
+      console.log(error.message);
+    });
+  }
+  const ic_sf_decideKMView = (type) => {
+    if (type === 'blok') {
+      return (
+        &lt;Grid container spacing={3}>
+          {
+            ic_st_blokItems.map((blokItem) => {
+              console.log('blokItem', JSON.stringify(blokItem));
+              return (
+                &lt;Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`-kolektor-grid-blok-${md5(blokItem.value + Date.now())}`}>
+                  &lt;Paper onClick={() => { ic_st_setKmActiveView('nomor'); ic_st_kmSetSelectedBlok(blokItem.text) }}>
+                    &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                      &lt;Typography content={'div'} variant={'subtitle2'}>Blok&lt;/Typography>
+                    &lt;/Box>
+                    &lt;Divider />
+                    &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                      &lt;Typography content={'div'} variant={'h2'}>{blokItem.text}&lt;/Typography>
+                    &lt;/Box>
+                  &lt;/Paper>
+                &lt;/Grid>
+              )
+            })
+          }
+        &lt;/Grid>
+      )
+    } else if (type === 'nomor') {
+      return (
+        &lt;Grid container spacing={5}>
+          {
+            ic_st_numberListOpsView
+          }
+        &lt;/Grid>
+      )
+    } else if (type === 'nominal') {
+      return (
+        &lt;Grid container spacing={5}>
+          {
+            ic_st_nomList.map((inv) => {
+              return (
+                ic_st_kmNomIsLoading ?
+                  &lt;Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-loading-${inv.id}`}>
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                    &lt;Skeleton variant="text" />
+                  &lt;/Grid>
+                  :
+                  &lt;Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={`kolektor-grid-nominal-${inv.id}`}>
+                    &lt;Paper onClick={() => {
+                      //test 
+                      ic_st_setKmNomIsLoading(true);
+                      //check the inv object
+                      console.log(JSON.stringify(inv))
+                      //prevent pay a paid invoice / RK/ TMB/ EMPTY
+                      if (inv['status-invoice'] !== false || inv['biaya'] === 'EMPTY' || inv['biaya'] === 'TMB' || inv['biaya'] === 'RK') {
+                        h_sf_showSnackbar('Invoice ini tidak bisa di bayar karena sudah lunas / RK / TMB / EMPTY', 'error');
+                        ic_st_setKmNomIsLoading(false);
+                        return;
+                      }
+                      //update the invoice to be paid
+                      try {
+                        const updateInv = async () => {
+                          const _now = Date.now();
+                          const separatedDate = getSeparatedDate(_now);
+                          await updateDoc(doc(db, "invoice", inv['id']), {
+                            'blok': ic_st_kmSelectedBlok,
+                            'nomor-rumah': ic_st_kmSelectedNomor,
+                            'biaya': inv['biaya'],
+                            'dibayar': inv['biaya'],
+                            'sisa': 0,
+                            'tanggal-dibayar': Date.now(),
+                            'kolektor': r_currentUser,
+                            'status-invoice': true,
+                            'hari': separatedDate.day, //add day when the bill is paid
+                          });
+                          h_sf_showSnackbar(`Tagihan ${inv['kategori']} untuk blok ${inv['blok']} no. ${inv['nomor-rumah']} telah LUNAS`, 'success');
+                          //reset states
+                          ic_st_setKmActiveView('blok');
+                          ic_st_kmSetSelectedBlok(null);
+                          ic_st_kmSetSelectedNomor(null);
+                          ic_st_kmSetSelectedBulan(null);
+                          ic_st_kmSetSelectedTahun(null);
+                          //update report
+                          await createReport(ic_st_kmSelectedBlok, inv['kategori'], parseInt(inv['biaya']), r_currentUser);
+                          h_sf_showSnackbar('Berhasil menambahkan laporan', 'success');
+                          ic_st_setKmNomIsLoading(false)
+                          //update ikk report if category is monthly
+                          if (inv['kategori'] === 'bulanan') {
+                            ic_st_setKmNomIsLoading(true);
+                            await createIkkReport(inv['tahun'], inv['bulan'], ic_st_kmSelectedBlok, inv['nomor-rumah'], parseInt(inv['subtotal']), parseInt(inv['biaya']), r_currentUser);
+                            h_sf_showSnackbar('Berhasil menambahkan laporan IKK', 'success');
+                            ic_st_setKmNomIsLoading(false);
+                          }
+                          //show paid invoice dialog
+                          ic_st_setIsKMCompleteDialogShown(true);
+                          //map inv data to fit RMSINvoiceDetail input requirement
+                          console.log('INV Inspect', JSON.stringify(inv)); //a single js obj
+                          const keys = Object.keys(inv);
+                          keys.forEach((k) => {
+                            if (k === 'status-invoice') {
+                              inv[k] = 'LUNAS';
+                            }
+                            if (k === 'nama-daftar-tagihan') {
+                              inv[k] = JSON.stringify(inv['nama-daftar-tagihan']);
+                            }
+                            if (k === 'status-tagihan') {
+                              inv[k] = 'LUNAS';
+                            }
+                            if (k === 'status-kelompok-tagihan') {
+                              inv[k] = 'LUNAS';
+                            }
+                            if (k === 'tanggal-dibuat') {
+                              inv[k] = toDate(inv['tanggal-dibuat'])
+                            }
+                            if (k === 'tanggal-aktif') {
+                              inv[k] = toDate(inv['tanggal-aktif'])
+                            }
+                            if (k === 'tanggal-dibayar') {
+                              inv[k] = toDate(inv['tanggal-dibayar'])
+                            }
+                            if (k === 'tagihan') {
+                              inv[k] = JSON.stringify(inv['tagihan'])
+                            }
+                          })
+                          inv["sudah-dibayar"] = parseInt(inv['biaya']);
+                          inv["sisa"] = 0;
+                          inv['kolektor'] = r_currentUser.name;
+                          ic_st_setKmCurrentPaidInv([inv]);
+                        }
+                        updateInv();
+                      } catch (err) {
+                        h_sf_showSnackbar(err.message, 'error');
+                        ic_st_setKmNomIsLoading(false);
+                      }
+                    }}>
+                      &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        {
+                          inv['status-invoice'] === false ? &lt;Typography content={'div'} variant={'subtitle2'} sx={{ color: 'red' }}>Bayar&lt;/Typography>
+                            :
+                            &lt;Typography sx={{ color: 'green' }} content={'div'} variant={'subtitle2'}>{`Sudah Lunas`}&lt;/Typography>
+                        }
+                      &lt;/Box>
+                      &lt;Divider />
+                      &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        &lt;Typography variant={'caption'}>ID : {inv.id}&lt;/Typography>
+                      &lt;/Box>
+                      &lt;Divider />
+                      &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        {
+                          inv['nama-daftar-tagihan'] === null || inv['nama-daftar-tagihan'] === undefined ? 'no-data' : inv['nama-daftar-tagihan'].map((n) => &lt;Typography key={n + Date.now()} content={'div'} variant={'caption'}>{n}&lt;/Typography>)
+                        }
+                      &lt;/Box>
+                      &lt;Divider />
+                      &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                        {
+                          inv['biaya'] === 'EMPTY' || inv['biaya'] === 'TMB' || inv['biaya'] === 'RK' ?
+                            &lt;Typography content={'div'} variant={'h2'}>{inv['biaya']}&lt;/Typography>
+                            :
+                            &lt;Typography content={'div'} variant={'h2'}>{formatRupiah(parseInt(inv['biaya']))}&lt;/Typography>
+                        }
+                      &lt;/Box>
+                    &lt;/Paper>
+                  &lt;/Grid>
+              )
+            })
+          }
+        &lt;/Grid>
+      )
+    } else if (type === 'bulan') {
+      return (
+        &lt;Grid container spacing={5}>
+          {
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((bln) => {
+              return (
+                &lt;Grid item xs={12} md={6} lg={6} xl={6} key={`kolektor-grid-bulan-${bln}`}>
+                  &lt;Paper onClick={() => {
+                    ic_st_setKmActiveView('tahun');
+                    ic_st_kmSetSelectedBulan(bln);
+                  }}>
+                    &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                      &lt;Typography content={'div'} variant={'subtitle2'}>Bulan&lt;/Typography>
+                    &lt;/Box>
+                    &lt;Divider />
+                    &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                      &lt;Typography content={'div'} variant={'h4'}>{defineMonthName(bln)}&lt;/Typography>
+                    &lt;/Box>
+                  &lt;/Paper>
+                &lt;/Grid>
+              )
+            })
+          }
+        &lt;/Grid>
+      )
+    } else if (type === 'tahun') {
+      return (
+        &lt;Grid container spacing={5}>
+          {
+            [2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040].map((thn) => {
+              return (
+                &lt;Grid item xs={12} md={6} lg={6} xl={6} key={`kolektor-grid-tahun-${thn}`}>
+                  &lt;Paper onClick={() => {
+                    ic_st_setKmActiveView('nominal');
+                    ic_st_kmSetSelectedTahun(thn);
+                  }}>
+                    &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                      &lt;Typography content={'div'} variant={'subtitle2'}>Tahun&lt;/Typography>
+                    &lt;/Box>
+                    &lt;Divider />
+                    &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                      &lt;Typography content={'div'} variant={'h2'}>{thn}&lt;/Typography>
+                    &lt;/Box>
+                  &lt;/Paper>
+                &lt;/Grid>
+              )
+            })
+          }
+        &lt;/Grid>
+      )
+    }
+  }
+  const ic_sf_decideScreen = () => {
+    if (r_currentLoginStatus === false) {
+      return (
+        &lt;RMSSignUp display={'default'} />
+      )
+    } else if (r_currentLoginStatus === true) {
+      if (r_currentUser.role > 1) {
+        /** admin and super admin view */
+        return (
+          &lt;Router>
+            &lt;div className="App" style={{ marginBottom: '100px' }}>
+              &lt;RMSTempDrawer isOpen={isDrawerOpen} handleClick={(bool) => setIsDrawerOpen(bool)} />
+              &lt;PrimarySearchAppBar title={r_currentPathState} handleMenuClick={() => setIsDrawerOpen(!isDrawerOpen)} handleLogout={handleLogout} />
+              &lt;Container maxWidth="xl" style={{ paddingTop: "40px" }}>
+                &lt;RMSBreadCrumbs />
+                &lt;Route path="/" exact={true}>
+                  &lt;Beranda />
+                &lt;/Route>
+                &lt;Route path="/lihat-invoice/:id">
+                  &lt;RMSLihatInvoice />
+                &lt;/Route>
+                &lt;Route path="/buat-invoice">
+                  &lt;RMSMakeInvoice />
+                &lt;/Route>
+                &lt;Route path="/bayar-cepat">
+                  &lt;RMSBayarCepat />
+                &lt;/Route>
+                &lt;Route path="/buat-invoice-umum">
+                  &lt;RMSBuatInvoiceUmum />
+                &lt;/Route>
+                &lt;Route path="/input-kk">
+                  &lt;InputKK />
+                &lt;/Route>
+                &lt;Route path="/lihat-kk">
+                  &lt;RMSLihatKK />
+                  {/** &lt;RMSCheckData /> **/}
+                &lt;/Route>
+                &lt;Route path="/cetak-kuitansi">
+                  &lt;CetakKuitansi />
+                &lt;/Route>
+                &lt;Route path="/input-biaya">
+                  &lt;InputBiaya />
+                &lt;/Route>
+                &lt;Route path="/laporan-kolektor">
+                  &lt;RMSCollectorReport />
+                &lt;/Route>
+                &lt;Route path="/laporan-kolektor-retribusi-kendaraan/">
+                  &lt;RMSRetribusiKendaraanReport />
+                &lt;/Route>
+                &lt;Route path="/lihat-laporan">
+                  &lt;RMSReport />
+                &lt;/Route>
+                &lt;Route path="/pengaturan-biaya">
+                  &lt;RMSPengaturanBiaya />
+                &lt;/Route>
+                &lt;Route path="/lihat-biaya">
+                  &lt;LihatBiaya />
+                &lt;/Route>
+                &lt;Route path="/manage-user">
+                  &lt;RMSManageUser />
+                &lt;/Route>
+              &lt;/Container>
+            &lt;/div>
+          &lt;/Router>
+        )
+      } else if (r_currentUser.role === 1) { //kolektor mode
+        return (
+          &lt;Box>
+            &lt;PrimarySearchAppBar title={'Mode Kolektor'} handleMenuClick={() => setIsDrawerOpen(!isDrawerOpen)} handleLogout={handleLogout} />
+            &lt;Container sx={{ paddingTop: '40px', paddingBottom: '40px' }}>
+              &lt;Box sx={{ padding: '10px' }}>
+                &lt;Button disabled={ic_st_kmActiveView === 'blok' ? true : false} variant={'contained'} onClick={() => {
+                  switch (ic_st_kmActiveView) {
+                    case 'nomor':
+                      ic_st_setKmActiveView('blok');
+                      ic_st_kmSetSelectedBlok(null);
+                      break;
+                    case 'bulan':
+                      ic_st_setKmActiveView('nomor');
+                      ic_st_kmSetSelectedNomor(null);
+                      break;
+                    case 'tahun':
+                      ic_st_setKmActiveView('bulan');
+                      ic_st_kmSetSelectedBulan(null);
+                      break;
+                    case 'nominal':
+                      ic_st_setKmActiveView('tahun');
+                      ic_st_kmSetSelectedTahun(null);
+                      break;
+                    default:
+                      break;
+                  }
+                }}>Kembali&lt;/Button>
+              &lt;/Box>
+              {
+                ic_st_kmSelectedBlok === null ? `` :
+                  &lt;Box sx={{ padding: '10px' }}>
+                    {
+                      ic_st_kmSelectedBlok === null ? `` :
+                        &lt;Typography variant={'caption'} content={'div'}>{`${ic_st_kmSelectedBlok}/`}&lt;/Typography>
+                    }
+                    {
+                      ic_st_kmSelectedNomor === null ? `` :
+                        &lt;Typography variant={'caption'} content={'div'}>{`${ic_st_kmSelectedNomor}/`}&lt;/Typography>
+                    }
+                    {
+                      ic_st_kmSelectedBulan === null ? `` :
+                        &lt;Typography variant={'caption'} content={'div'}>{`${defineMonthName(ic_st_kmSelectedBulan)}/`}&lt;/Typography>
+                    }
+                    {
+                      ic_st_kmSelectedTahun === null ? `` :
+                        &lt;Typography variant={'caption'} content={'div'}>{`${ic_st_kmSelectedTahun}`}&lt;/Typography>
+                    }
+                  &lt;/Box>
+              }
+              &lt;Divider />
+              &lt;Box sx={{ padding: '10px' }}>
+                {
+                  ic_sf_decideKMView(ic_st_kmActiveView)
+                }
+              &lt;/Box>
+            &lt;/Container>
+          &lt;/Box>
+        )
+      } else if (r_currentUser.role === 0) { //pending view
+        /** account is on pending view */
+        return (
+          &lt;Container sx={{ paddingTop: '10px', paddingBottom: '10px' }}>
+            &lt;Paper>
+              &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                &lt;Typography variant={'h6'} content={'div'}>Terima kasih sudah melakukan pendaftaran.&lt;/Typography>
+              &lt;/Box>
+              &lt;Divider />
+              &lt;Box sx={{ padding: '10px' }}>
+                &lt;Typography variant={'body2'} content={'div'} gutterBottom>
+                  Hi {r_currentUser.name} ,Team kami akan memberikan anda akses masuk ke aplikasi apabila semua persyaratan yang dibutuhkan telah terpenuhi. Untuk saat ini anda bisa logout terlebih dahulu, nantinya apabila akses sudah kami berikan maka anda bisa login kembali dengan menggunakan email dan password terdaftar. Terima kasih.
+                &lt;/Typography>
+              &lt;/Box>
+              &lt;Divider />
+              &lt;Box sx={{ padding: '10px' }} textAlign={'right'}>
+                &lt;Button variant={'contained'} onClick={handleLogout}>Logout&lt;/Button>
+              &lt;/Box>
+            &lt;/Paper>
+          &lt;/Container>
+        )
+      }
+    } else {
+      return (
+        &lt;Paper sx={{ padding: '10px' }}>
+          loading...
+        &lt;/Paper>
+      )
+    }
+  }
+  useEffect(() => {
+    console.log('ic_st_user tracker effect');
+    setIsLoading(true);
+    if (ic_st_user === null) {
+      updateCurrentUser(null)
+      updateCurrentLoginStatus(false);
+    } else {
+      //get user data from db
+      try {
+        const getDataFromDb = async () => {
+          console.log('getting user db');
+          const docSnap = await getDoc(doc(db, "user", ic_st_user.uid));
+          if (docSnap.exists()) {
+            updateCurrentUser(docSnap.data());
+            setIsLoading(false);
+            updateCurrentLoginStatus(true);
+          } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+            setIsLoading(false);
+            updateCurrentLoginStatus(false);
+          }
+        }
+        getDataFromDb();
+      } catch (err) {
+        console.log(err.message);
+      }
+    }
+    setIsLoading(false);
+  }, [ic_st_user]);
+  useEffect(() => {
+    if (r_currentUser !== null || r_currentUser !== undefined) {
+      console.log('[r_currentUser] inspect ', r_currentUser)
+    }
+  }, [r_currentUser])
+  useEffect(() => {
+    const getNumberList = async () => {
+      try {
+        let numberList = [];
+        //if cache not set yet, get it from db
+        if (cache_blok[ic_st_kmSelectedBlok] === null || cache_blok[ic_st_kmSelectedBlok] === undefined) {
+          h_sf_showSnackbar('getting data from db..', 'warning');
+          const kk = await getDocs(query(collection(db, 'kk'), where('blok', '==', ic_st_kmSelectedBlok), orderBy("no_rumah")));
+          kk.forEach((k) => {
+            console.log(k.data()['no_rumah'])
+            numberList.push(k.data()['no_rumah']);
+          })
+          const cacheObject = { ...cache_blok };
+          cacheObject[ic_st_kmSelectedBlok] = numberList;
+          set_cache_blok(cacheObject);
+        } else {
+          h_sf_showSnackbar('using cache', 'success');
+          numberList = cache_blok[ic_st_kmSelectedBlok]
+        }
+        /** processing view */
+        let view = [];
+        const nArr = []; //array that help check for duplicating nomor-rumah
+        numberList.forEach((n) => {
+          //alert(n)
+          //filter out same nomor rumah
+          if (nArr.includes(n)) {
+            //the number already pushed,.. so the view will not displaying it
+            console.log('the number already pushed,.. so the view will not displaying it');
+          } else {
+            nArr.push(n);
+            view.push(
+              &lt;Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={`-kolektor-grid-nomor-${md5(n + Date.now())}`}>
+                &lt;Paper onClick={() => { ic_st_setKmActiveView('bulan'); ic_st_kmSetSelectedNomor(n) }}>
+                  &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                    &lt;Typography content={'div'} variant={'subtitle2'}>Nomor&lt;/Typography>
+                  &lt;/Box>
+                  &lt;Divider />
+                  &lt;Box sx={{ padding: '10px' }} textAlign={'center'}>
+                    &lt;Typography content={'div'} variant={'h2'}>{n}&lt;/Typography>
+                  &lt;/Box>
+                &lt;/Paper>
+              &lt;/Grid>
+            )
+          }
+        })
+        ic_st_setNumberListOpsView(view);
+      } catch (err) {
+        console.log(err.message);
+      }
+    }
+    if (ic_st_kmSelectedBlok !== null) {
+      getNumberList();
+    }
+  }, ic_st_kmSelectedBlok)
+  useEffect(() => {
+    const getNominalList = async () => {
+      ic_st_setKmNomIsLoading(true);
+      try {
+        let nomList = [];
+        const conditions = [
+          where('blok', '==', ic_st_kmSelectedBlok),
+          where('nomor-rumah', '==', ic_st_kmSelectedNomor),
+          where('bulan', '==', ic_st_kmSelectedBulan),
+          where('tahun', '==', ic_st_kmSelectedTahun),
+          where('status-invoice', '==', false)
+        ]
+        const nominalList = await getDocs(query(collection(db, 'invoice'), ...conditions))
+        nominalList.forEach((nom) => {
+          nomList.push({ id: nom.id, ...nom.data() })
+        });
+        ic_st_setNomList(nomList);
+        ic_st_setKmNomIsLoading(false);
+      } catch (err) {
+        console.log(err.message);
+        ic_st_setKmNomIsLoading(false);
+      }
+    }
+    if (ic_st_kmSelectedTahun != null) {
+      getNominalList();
+    }
+  }, [ic_st_kmSelectedTahun])
+  onAuthStateChanged(auth, (user) => {
+    try {
+      if (user) { //user is signed in
+        console.log('onAuthStateChanged get called');
+        ic_st_setUser(user);
+      } else {
+        // User is signed out
+        ic_st_setUser(null);
+      }
+    } catch (err) {
+      console.log(err.message);
+      h_sf_showSnackbar(err.message, 'error');
+    }
+  });
+  const ic_sf_constructQRData = () => {
+    let objString = JSON.stringify({
+      'id': ic_st_kmCurrentPaidInv[0]['id'],
+      'blok': ic_st_kmCurrentPaidInv[0]['blok'],
+      'nomor-rumah': ic_st_kmCurrentPaidInv[0]['nomor-rumah'],
+      'sisa': ic_st_kmCurrentPaidInv[0]['sisa'],
+      'status-invoice': true,
+    })
+    return objString;
+  }
+  return (
+    &lt;>
+      {
+        &lt;Box>
+          &lt;LinearProgress color="secondary" sx={{ display: isLoading ? 'default' : 'none' }} />
+          {
+            ic_sf_decideScreen()
+          }
+          {/** snack bar */}
+          &lt;RMSSnackbar
+            isOpen={h_st_isSnackbarShown}
+            handleClose={() => h_sf_closeSnackbar()}
+            severity={h_st_severity}
+            message={h_st_message} />
+          {/** Paid Invoice Dialog (KM) ic_st_isKMCompleteDialogShown */}
+          &lt;Dialog open={ic_st_isKMCompleteDialogShown}>
+            &lt;DialogTitle>Bukti Pembayaran&lt;/DialogTitle>
+            &lt;Divider />
+            &lt;DialogContent>
+              {
+                ic_st_kmNomIsLoading ? &lt;LinearProgress /> : &lt;>&lt;/>
+              }
+              &lt;RMSInvoiceDetail
+                ref={invoiceImgRef}
+                isOpen={true}
+                currentRow={ic_st_kmCurrentPaidInv}
+                handleBackButton={() => ic_st_setIsKMCompleteDialogShown(false)}
+              >
+                {/** &lt;QRCode size={64} value={ic_st_currentSelectedRowData.length > 0 ? ic_sf_constructQRData() : 'invalid'} /> */}
+                &lt;QRCode size={64} value={ic_st_kmCurrentPaidInv.length > 0 ? ic_sf_constructQRData() : 'invalid'} />
+              &lt;/RMSInvoiceDetail>
+            &lt;/DialogContent>
+            &lt;Divider />
+            &lt;DialogActions>
+              &lt;Stack direction={'column'}>
+                &lt;TextField sx={{ marginBottom: '5px' }} type={'number'} onChange={(e) => ic_st_setWaNUmberFIx(e.target.value)}>&lt;/TextField>
+                {/** &lt;a href={ic_st_kmWaLink} style={{ textDecoration: 'none' }}> **/}
+                &lt;Button disabled={ic_st_kmNomIsLoading ? true : false} startIcon={&lt;WhatsAppIcon />} sx={{ width: '100%' }} variant={'contained'} onClick={() => {
+                  //prevent processing if telp number is empty.
+                  if (ic_st_waNumberFix.length === 0) {
+                    h_sf_showSnackbar('Nomor Telpon harus diisi', 'error');
+                    return;
+                  }
+                  //download the image first, in case we will need it later
+
+                  const downloadImage = async () => {
+                    //set the loading to true
+                    ic_st_setKmNomIsLoading(true);
+                    const element = invoiceImgRef.current;
+                    const canvas = await html2canvas(element);
+                    console.log('IMG CANVAS INSPECT', canvas);
+                    const data = canvas.toDataURL('image/jpg');
+                    console.log('IMG DATA INSPECT', data);
+                    //upload to firebase storage
+                    console.log('ic_st_kmCurrentPaidInv INSPECTO', JSON.stringify(ic_st_kmCurrentPaidInv));
+                    const id = ic_st_kmCurrentPaidInv[0]['id'];
+                    try {
+                      const storageRef = ref(storage, `invoices-${id}.png`);
+                      //upload data
+                      await uploadString(storageRef, data, 'data_url').then((snapshot) => {
+                        console.log('data url snapshot', snapshot);
+                        console.log('Uploaded a data_url string!');
+                      });
+                      //Get the download URL
+                      getDownloadURL(storageRef)
+                        .then((url) => {
+                          //click the link to download programmatically
+                          const link = document.createElement('a');
+                          if (typeof link.download === 'string') {
+                            link.href = data;
+                            link.download = `invoices-${id}.jpg`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          } else {
+                            window.open(data);
+                          }
+                          //send to whatsapp
+                          const linkWA = document.createElement('a');
+                          const waLink = getWhatsappLink(ic_st_waNumberFix, url)
+                          linkWA.href = waLink;
+                          document.body.appendChild(linkWA);
+                          linkWA.click();
+                          document.body.removeChild(linkWA);
+                          ic_st_setWaNUmberFIx(0);
+                          ic_st_setKmNomIsLoading(false);
+                          ic_st_setIsKMCompleteDialogShown(false); //close dialog
+                        })
+                        .catch((error) => {
+                          // A full list of error codes is available at
+                          // https://firebase.google.com/docs/storage/web/handle-errors
+                          switch (error.code) {
+                            case 'storage/object-not-found':
+                              // File doesn't exist
+                              break;
+                            case 'storage/unauthorized':
+                              // User doesn't have permission to access the object
+                              break;
+                            case 'storage/canceled':
+                              // User canceled the upload
+                              break;
+
+                            // ...
+
+                            case 'storage/unknown':
+                              // Unknown error occurred, inspect the server response
+                              break;
+                          }
+                          h_sf_showSnackbar(error.code, 'error');
+                          ic_st_setKmNomIsLoading(false);
+                          ic_st_setIsKMCompleteDialogShown(false); //close dialog
+                        })
+                    } catch (err) {
+                      h_sf_showSnackbar(err.message, 'error');
+                      console.log(err.message);
+                      ic_st_setKmNomIsLoading(false);
+                    }
+                  };
+                  const finishProcess = async () => {
+                    try {
+                      await downloadImage();
+                    } catch (err) {
+                      h_sf_showSnackbar(err.message, 'error');
+                      ic_st_setIsKMCompleteDialogShown(false);//close dialog
+                    }
+                  }
+                  finishProcess();
+                }}>Kirim ke WA&lt;/Button>
+                {/** &lt;/a> */}
+              &lt;/Stack>
+            &lt;/DialogActions>
+          &lt;/Dialog>
+        &lt;/Box>
+      }
+    &lt;/>
+  );
+}
+
+export default App;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Tue Feb 08 2022 23:11:03 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
