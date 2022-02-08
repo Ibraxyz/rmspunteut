@@ -1,3 +1,4 @@
+/** this is a documentation for App.js */
 import './App.css';
 import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import React, { useEffect, useState, useRef } from "react";
@@ -101,7 +102,7 @@ function App() {
     })
     ic_st_setBlokItems(blocks);
   }, [ic_st_an, ic_st_aazz, ic_st_tasbiII])
-  //redux 
+  /** redux related variables */
   const dispatch = useDispatch();
   const { updateCurrentLoginStatus, updateCurrentUser } = bindActionCreators(actionCreators, dispatch);
   const r_currentPathState = useSelector((state) => state.currentPath);
